@@ -15,4 +15,7 @@ reimbursementRoutes.post('/:id/reject', authMiddleware, reimbursementController.
 reimbursementRoutes.post('/:id/pay', authMiddleware, reimbursementController.pay);
 reimbursementRoutes.post('/:id/cancel', authMiddleware, reimbursementController.cancel);
 
+reimbursementRoutes.post('/:id/attachments', authMiddleware, reimbursementController.addAttachment);
+reimbursementRoutes.get('/:id/history', authMiddleware, reimbursementController.getHistory);
+
 export default reimbursementRoutes;

@@ -1,9 +1,9 @@
 import { prisma } from '../lib/prisma';
 import { z } from 'zod';
-import { createReimbursementSchema } from '../schemas/reimbursementSchema';
+import { createReimbursementSchema, createAttachmentSchema } from '../schemas/reimbursementSchema';
 
 export class ReimbursementService {
-  
+
   async create(employeeId: string, data: z.infer<typeof createReimbursementSchema>) {
     const category = await prisma.category.findUnique({
       where: { id: data.categoryId },
@@ -48,26 +48,26 @@ export class ReimbursementService {
     } else if (user.role === 'MANAGER') {
       return prisma.reimbursement.findMany({
         where: { status: 'SUBMITTED' },
-        include: { 
-          category: true, 
-          employee: { select: { id: true, name: true, email: true } } 
+        include: {
+          category: true,
+          employee: { select: { id: true, name: true, email: true } }
         },
         orderBy: { createdAt: 'desc' },
       });
     } else if (user.role === 'FINANCE') {
       return prisma.reimbursement.findMany({
         where: { status: 'APPROVED' },
-        include: { 
-          category: true, 
-          employee: { select: { id: true, name: true, email: true } } 
+        include: {
+          category: true,
+          employee: { select: { id: true, name: true, email: true } }
         },
         orderBy: { createdAt: 'desc' },
       });
     } else if (user.role === 'ADMIN') {
       return prisma.reimbursement.findMany({
-        include: { 
-          category: true, 
-          employee: { select: { id: true, name: true, email: true } } 
+        include: {
+          category: true,
+          employee: { select: { id: true, name: true, email: true } }
         },
         orderBy: { createdAt: 'desc' },
       });
@@ -81,7 +81,7 @@ export class ReimbursementService {
       include: {
         category: true,
         employee: { select: { id: true, name: true, email: true } },
-        history: { 
+        history: {
           orderBy: { createdAt: 'desc' },
           include: {
             author: { select: { id: true, name: true } }
@@ -104,15 +104,15 @@ export class ReimbursementService {
   }
 
   async submit(id: string, user: { id: string; role: string }) {
-    
+
     if (user.role !== 'EMPLOYEE') {
-    throw new Error('Only EMPLOYEE can submit reimbursements');
+      throw new Error('Only EMPLOYEE can submit reimbursements');
     }
 
     const reimbursement = await this.findById(id, user);
 
     if (reimbursement.employeeId !== user.id) {
-    throw new Error('Only the owner can submit this reimbursement');
+      throw new Error('Only the owner can submit this reimbursement');
     }
 
     if (reimbursement.status !== 'DRAFT') {
@@ -153,32 +153,32 @@ export class ReimbursementService {
   }
 
   async reject(id: string, reason: string, user: { id: string; role: string }) {
-  if (user.role !== 'MANAGER') {
-    throw new Error('Only MANAGER can reject reimbursements');
-  }
+    if (user.role !== 'MANAGER') {
+      throw new Error('Only MANAGER can reject reimbursements');
+    }
 
-  const reimbursement = await this.findById(id, user);
+    const reimbursement = await this.findById(id, user);
 
-  if (reimbursement.status !== 'SUBMITTED') {
-    throw new Error('Only SUBMITTED reimbursements can be rejected');
-  }
+    if (reimbursement.status !== 'SUBMITTED') {
+      throw new Error('Only SUBMITTED reimbursements can be rejected');
+    }
 
-  return prisma.$transaction(async (tx) => {
-    const updated = await tx.reimbursement.update({
-      where: { id },
-      data: { status: 'REJECTED', rejectionReason: reason },
+    return prisma.$transaction(async (tx) => {
+      const updated = await tx.reimbursement.update({
+        where: { id },
+        data: { status: 'REJECTED', rejectionReason: reason },
+      });
+      await tx.reimbursementHistory.create({
+        data: {
+          action: 'REJECTED',
+          reimbursementId: id,
+          authorId: user.id,
+          notes: `Rejected: ${reason}`,
+        },
+      });
+      return updated;
     });
-    await tx.reimbursementHistory.create({
-      data: {
-        action: 'REJECTED',
-        reimbursementId: id,
-        authorId: user.id,
-        notes: `Rejected: ${reason}`,
-      },
-    });
-    return updated;
-  });
-}
+  }
 
   async pay(id: string, user: { id: string; role: string }) {
     if (user.role !== 'FINANCE') {
@@ -202,14 +202,14 @@ export class ReimbursementService {
   }
 
   async cancel(id: string, user: { id: string; role: string }) {
-    
+
     if (user.role !== 'EMPLOYEE') {
-    throw new Error('Only EMPLOYEE can cancel reimbursements');
-  }
+      throw new Error('Only EMPLOYEE can cancel reimbursements');
+    }
     const reimbursement = await this.findById(id, user);
-    
+
     if (reimbursement.employeeId !== user.id) {
-       throw new Error('Only the owner can cancel this reimbursement');
+      throw new Error('Only the owner can cancel this reimbursement');
     }
     if (reimbursement.status !== 'DRAFT' && reimbursement.status !== 'SUBMITTED') {
       throw new Error('Only DRAFT or SUBMITTED reimbursements can be canceled');
@@ -224,6 +224,40 @@ export class ReimbursementService {
         data: { action: 'CANCELED', reimbursementId: id, authorId: user.id, notes: 'Reimbursement canceled' }
       });
       return updated;
+    });
+  }
+
+  async addAttachment(id: string, data: z.infer<typeof createAttachmentSchema>, user: { id: string; role: string }) {
+    
+    const reimbursement = await this.findById(id, user);
+
+    if (reimbursement.employeeId !== user.id) {
+      throw new Error('Only the owner can add attachments to this reimbursement');
+    }
+
+    if (reimbursement.status !== 'DRAFT' && reimbursement.status !== 'SUBMITTED') {
+      throw new Error('Attachments can only be added to DRAFT or SUBMITTED reimbursements');
+    }
+
+    return prisma.attachment.create({
+      data: {
+        fileName: data.fileName,
+        url: data.url,
+        fileType: data.fileType,
+        reimbursementId: id,
+      },
+    });
+  }
+
+  async getHistory(id: string, user: { id: string; role: string }) {
+    await this.findById(id, user);
+
+    return prisma.reimbursementHistory.findMany({
+      where: { reimbursementId: id },
+      include: {
+        author: { select: { id: true, name: true } },
+      },
+      orderBy: { createdAt: 'desc' },
     });
   }
 }

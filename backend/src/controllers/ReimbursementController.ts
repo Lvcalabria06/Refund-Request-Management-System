@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { ReimbursementService } from '../services/ReimbursementService';
-import { createReimbursementSchema, rejectReimbursementSchema } from '../schemas/reimbursementSchema';
+import { createReimbursementSchema, rejectReimbursementSchema, createAttachmentSchema } from '../schemas/reimbursementSchema';
 import { ZodError } from 'zod';
 
 const reimbursementService = new ReimbursementService();
@@ -15,7 +15,14 @@ function handleError(res: Response, error: any) {
   if (message.includes('not found')) {
     return res.status(404).json({ error: message });
   }
-  if (message.includes('Only') || message.includes('owner') || message.includes('Unauthorized')) {
+  
+  if (
+    message.includes('Only EMPLOYEE') || 
+    message.includes('Only MANAGER') || 
+    message.includes('Only FINANCE') || 
+    message.includes('owner') || 
+    message.includes('Unauthorized')
+  ) {
     return res.status(403).json({ error: message });
   }
 
@@ -106,6 +113,29 @@ export class ReimbursementController {
       const { id } = req.params;
       const reimbursement = await reimbursementService.cancel(String(id), user);
       res.status(200).json(reimbursement);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  }
+
+  async addAttachment(req: Request, res: Response) {
+    try {
+      const user = req.user!;
+      const { id } = req.params;
+      const validatedData = createAttachmentSchema.parse(req.body);
+      const attachment = await reimbursementService.addAttachment(String(id), validatedData, user);
+      res.status(201).json(attachment);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  }
+
+  async getHistory(req: Request, res: Response) {
+    try {
+      const user = req.user!;
+      const { id } = req.params;
+      const history = await reimbursementService.getHistory(String(id), user);
+      res.status(200).json(history);
     } catch (error: any) {
       handleError(res, error);
     }
