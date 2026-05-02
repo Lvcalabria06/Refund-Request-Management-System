@@ -1,6 +1,7 @@
 import { prisma } from '../lib/prisma';
 import { z } from 'zod';
 import { createReimbursementSchema, createAttachmentSchema } from '../schemas/reimbursementSchema';
+import dayjs from 'dayjs';
 
 export class ReimbursementService {
 
@@ -13,12 +14,17 @@ export class ReimbursementService {
       throw new Error('Category is invalid or inactive');
     }
 
+    const expenseDate = dayjs(data.expenseDate);
+    if (expenseDate.isAfter(dayjs())) {
+      throw new Error('Expense date cannot be in the future');
+    }
+
     return prisma.$transaction(async (tx) => {
       const reimbursement = await tx.reimbursement.create({
         data: {
           description: data.description,
           amount: data.amount,
-          expenseDate: new Date(data.expenseDate),
+          expenseDate: expenseDate.toDate(),
           categoryId: data.categoryId,
           employeeId,
           status: 'DRAFT',
