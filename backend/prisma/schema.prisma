@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+  
+model User {
+  id             String                 @id @default(uuid())
+  name           String
+  email          String                 @unique
+  password       String
+  role           String                 @default("EMPLOYEE") // EMPLOYEE, MANAGER, FINANCE, ADMIN
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  reimbursements Reimbursement[]        @relation("UserReimbursements")
+  actions        ReimbursementHistory[] @relation("UserHistoryActions")
+}
+
+model Category {
+  id             String          @id @default(uuid())
+  name           String
+  isActive       Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  reimbursements Reimbursement[]
+}
+
+model Reimbursement {
+  id               String                 @id @default(uuid())
+  description      String
+  amount           Float
+  expenseDate      DateTime
+  status           String                 @default("DRAFT") // DRAFT, SUBMITTED, APPROVED, REJECTED, PAID, CANCELED
+  rejectionReason  String?
+
+  employeeId       String
+  employee         User                   @relation("UserReimbursements", fields: [employeeId], references: [id])
+
+  categoryId       String
+  category         Category               @relation(fields: [categoryId], references: [id])
+
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+
+  history          ReimbursementHistory[]
+  attachments      Attachment[]
+
+  @@index([status])
+  @@index([employeeId])
+}
+
+model ReimbursementHistory {
+  id              String        @id @default(uuid())
+  action          String // CREATED, UPDATED, SUBMITTED, APPROVED, REJECTED, PAID, CANCELED
+  notes           String?
+
+  reimbursementId String
+  reimbursement   Reimbursement @relation(fields: [reimbursementId], references: [id])
+
+  authorId        String
+  author          User          @relation("UserHistoryActions", fields: [authorId], references: [id])
+
+  createdAt       DateTime      @default(now())
+}
+
+model Attachment {
+  id              String        @id @default(uuid())
+  fileName        String
+  url             String
+  fileType        String
+
+  reimbursementId String
+  reimbursement   Reimbursement @relation(fields: [reimbursementId], references: [id])
+
+  createdAt       DateTime      @default(now())
+}
