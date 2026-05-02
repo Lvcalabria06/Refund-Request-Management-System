@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Desafio Técnico | Controle de Solicitações de Reembolso</title>
+
+  <style>
+    :root {
+      --pitang-black: #111111;
+      --pitang-graphite: #1f2933;
+      --pitang-gray: #5f6673;
+      --pitang-light: #f6f7f9;
+      --pitang-white: #ffffff;
+      --pitang-orange: #c8102e;
+      --pitang-orange-dark: #9f0f24;
+      --pitang-orange-soft: #fde8ec;
+      --pitang-yellow: #f7b733;
+      --pitang-green: #10a37f;
+      --pitang-blue: #2563eb;
+      --pitang-red: #d92d20;
+      --border: #e7e9ee;
+      --radius: 18px;
+      --shadow: 0 18px 45px rgba(17, 17, 17, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(243, 111, 33, 0.10), transparent 34rem),
+        linear-gradient(180deg, #ffffff 0%, #f6f7f9 38%, #eef0f4 100%);
+      color: var(--pitang-black);
+      line-height: 1.6;
+    }
+
+    header {
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(17,17,17,.96) 0%, rgba(31,41,51,.94) 55%, rgba(243,111,33,.92) 120%);
+      color: var(--pitang-white);
+      padding: 52px 32px 58px;
+      border-bottom: 6px solid var(--pitang-orange);
+    }
+
+    header::before {
+      content: "";
+      position: absolute;
+      width: 520px;
+      height: 520px;
+      right: -190px;
+      top: -230px;
+      border-radius: 50%;
+      background: rgba(243, 111, 33, 0.22);
+      filter: blur(2px);
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      right: 6%;
+      bottom: -92px;
+      width: 280px;
+      height: 280px;
+      background:
+        linear-gradient(135deg, transparent 0 28%, rgba(255,255,255,0.08) 28% 34%, transparent 34% 100%),
+        linear-gradient(45deg, transparent 0 48%, rgba(243,111,33,0.38) 48% 54%, transparent 54% 100%);
+      transform: rotate(-10deg);
+      opacity: .85;
+    }
+
+    header .header-content {
+      max-width: 1180px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 26px;
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--pitang-orange);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      color: #fff;
+      box-shadow: 0 14px 30px rgba(243, 111, 33, .28);
+    }
+
+    .brand-name {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    header .eyebrow {
+      display: inline-flex;
+      padding: 7px 13px;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 999px;
+      color: #fff4ed;
+      background: rgba(243, 111, 33, 0.18);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 5vw, 56px);
+      line-height: 1.02;
+      letter-spacing: -0.055em;
+      max-width: 900px;
+    }
+
+    header p {
+      max-width: 850px;
+      margin: 20px 0 0;
+      color: #e7e9ee;
+      font-size: 18px;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    .hero-tag {
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.08);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 286px minmax(0, 1fr);
+      gap: 28px;
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 30px 28px;
+    }
+
+    aside {
+      position: sticky;
+      top: 24px;
+      align-self: start;
+      background: rgba(255,255,255,0.86);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      max-height: calc(100vh - 48px);
+      overflow: auto;
+    }
+
+    aside h2 {
+      font-size: 12px;
+      color: var(--pitang-gray);
+      margin: 0 0 12px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+    }
+
+    aside a {
+      display: block;
+      text-decoration: none;
+      color: var(--pitang-graphite);
+      padding: 9px 10px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      border-left: 3px solid transparent;
+    }
+
+    aside a:hover {
+      color: var(--pitang-orange-dark);
+      background: var(--pitang-orange-soft);
+      border-left-color: var(--pitang-orange);
+    }
+
+    main {
+      min-width: 0;
+    }
+
+    section {
+      background: rgba(255,255,255,0.94);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 30px;
+      margin-bottom: 24px;
+      scroll-margin-top: 24px;
+    }
+
+    section > h2 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    section > h2::before {
+      content: "";
+      display: inline-block;
+      width: 10px;
+      height: 30px;
+      background: var(--pitang-orange);
+      border-radius: 99px;
+      flex: 0 0 auto;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 26px;
+      letter-spacing: -0.03em;
+      color: var(--pitang-black);
+    }
+
+    h3 {
+      margin: 24px 0 10px;
+      font-size: 18px;
+      color: var(--pitang-black);
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      margin: 0 0 14px;
+      color: var(--pitang-gray);
+    }
+
+    ul {
+      margin: 10px 0 0 20px;
+      padding: 0;
+      color: var(--pitang-gray);
+    }
+
+    li {
+      margin-bottom: 7px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      background:
+        linear-gradient(180deg, #ffffff 0%, #fbfbfc 100%);
+      border-radius: 16px;
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: var(--pitang-orange);
+      opacity: .85;
+    }
+
+    .card h3 {
+      margin-top: 0;
+    }
+
+    .highlight {
+      border: 1px solid #ffd7bf;
+      border-left: 6px solid var(--pitang-orange);
+      background: var(--pitang-orange-soft);
+      padding: 16px;
+      border-radius: 14px;
+      color: #78350f;
+      margin: 18px 0;
+    }
+
+    .warning {
+      border: 1px solid #fde68a;
+      border-left: 6px solid var(--pitang-yellow);
+      background: #fffbeb;
+      padding: 16px;
+      border-radius: 14px;
+      color: #92400e;
+      margin: 18px 0;
+    }
+
+    .danger-note {
+      border: 1px solid #fecaca;
+      border-left: 6px solid var(--pitang-red);
+      background: #fff5f5;
+      padding: 16px;
+      border-radius: 14px;
+      color: #991b1b;
+      margin: 18px 0;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin-top: 16px;
+      background: white;
+    }
+
+    table {
+      width: 100%;
+      min-width: 720px;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    th {
+      background: #111111;
+      color: #ffffff;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      text-align: left;
+      padding: 14px 15px;
+      border-bottom: 1px solid #2b2b2b;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 14px 15px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      color: var(--pitang-gray);
+    }
+
+    tr:nth-child(even) td {
+      background: #fcfcfd;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    code, pre {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+
+    code {
+      color: var(--pitang-orange-dark);
+      background: var(--pitang-orange-soft);
+      padding: 2px 6px;
+      border-radius: 7px;
+      font-weight: 700;
+    }
+
+    pre {
+      background: #111111;
+      color: #f6f7f9;
+      padding: 18px;
+      border-radius: 16px;
+      overflow: auto;
+      font-size: 14px;
+      border: 1px solid #2b2b2b;
+    }
+
+    pre code {
+      color: inherit;
+      background: transparent;
+      padding: 0;
+      border-radius: 0;
+      font-weight: 500;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      white-space: nowrap;
+    }
+
+    .badge-blue { color: #1d4ed8; background: #dbeafe; }
+    .badge-green { color: #047857; background: #d1fae5; }
+    .badge-red { color: #b91c1c; background: #fee2e2; }
+    .badge-yellow { color: #92400e; background: #fef3c7; }
+    .badge-gray { color: #111111; background: #e7e9ee; }
+    .badge-purple { color: #6d28d9; background: #ede9fe; }
+
+    .checklist {
+      columns: 2;
+      column-gap: 32px;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--pitang-gray);
+      font-size: 13px;
+      padding: 24px 0 8px;
+    }
+
+    .print-note {
+      margin-top: 18px;
+      font-size: 13px;
+      color: #f8d9c7;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      aside {
+        display: none;
+      }
+
+      .layout {
+        display: block;
+        padding: 0;
+      }
+
+      section {
+        box-shadow: none;
+        page-break-inside: avoid;
+      }
+    }
+
+    @media (max-width: 960px) {
+      header {
+        padding: 36px 20px 42px;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+        padding: 16px;
+      }
+
+      aside {
+        position: relative;
+        top: 0;
+        max-height: none;
+      }
+
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .checklist {
+        columns: 1;
+      }
+
+      section {
+        padding: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="header-content">
+      <div class="brand-row">
+        <img src="data:image/png;base64,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" alt="Pitang" style="height:48px;border-radius:8px;box-shadow:0 10px 20px rgba(0,0,0,.2)"/>
+      </div>
+
+      <span class="eyebrow">Desafio técnico fullstack</span>
+      <h1>Controle de Solicitações de Reembolso</h1>
+      <p>
+        Aplicação fullstack aderente à ementa do curso: React, React Router, Context API, Node.js, Express, TypeScript, JWT, Zod, ORM, testes e boas práticas de API REST.
+      </p>
+
+      <div class="hero-tags">
+        <span class="hero-tag">Pessoas</span>
+        <span class="hero-tag">Inovação</span>
+        <span class="hero-tag">Tecnologia</span>
+        <span class="hero-tag">Transformação Digital</span>
+      </div>
+
+      <p class="print-note">
+        Documento visual inspirado no posicionamento institucional da Pitang, com CSS interno e sem dependências externas.
+      </p>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside>
+      <h2>Sumário</h2>
+      <a href="#visao-geral">1. Visão geral</a>
+      <a href="#stack">2. Stack obrigatória</a>
+      <a href="#fora-escopo">3. Fora de escopo</a>
+      <a href="#contexto">4. Contexto</a>
+      <a href="#perfis">5. Perfis</a>
+      <a href="#entidades">6. Entidades</a>
+      <a href="#historico">7. Histórico</a>
+      <a href="#status">8. Status</a>
+      <a href="#acoes">9. Ações</a>
+      <a href="#regras-detalhadas">10. Regras detalhadas</a>
+      <a href="#validacoes">11. Validações</a>
+      <a href="#transicoes">12. Transições</a>
+      <a href="#erros">13. Tratamento de erros</a>
+      <a href="#backend">14. Backend</a>
+      <a href="#frontend">15. Frontend</a>
+      <a href="#endpoints">16. Endpoints</a>
+      <a href="#plus">17. Diferenciais</a>
+      <a href="#avaliacao">18. Avaliação</a>
+      <a href="#entrega">19. Entrega esperada</a>
+    </aside>
+
+    <main>
+      <section id="visao-geral">
+        <h2>1. Visão geral do desafio</h2>
+        <p>
+          O objetivo deste desafio é construir uma aplicação fullstack para controle de solicitações
+          de reembolso. A aplicação deve permitir que colaboradores criem pedidos, gestores aprovem
+          ou rejeitem solicitações e o financeiro marque solicitações aprovadas como pagas.
+        </p>
+        <p>
+          O escopo foi ajustado para avaliar os conteúdos ensinados na ementa do curso:
+          JavaScript, TypeScript, Node.js, Express, APIs RESTful, status HTTP, middlewares, JWT,
+          Zod, ORM, manipulação de datas, testes, React, Hooks, React Router, Context API e bibliotecas de UI.
+        </p>
+
+        <div class="highlight">
+          <strong>Importante:</strong> As regras devem ser implementadas de forma clara,
+          objetiva e sem ambiguidades. Sempre que uma ação for bloqueada, a API deve retornar o status HTTP adequado
+          e o frontend deve exibir uma mensagem visual compreensível para o usuário.
+        </div>
+
+        <div class="grid grid-3">
+          <div class="card">
+            <h3>Backend</h3>
+            <p>Node.js, Express, TypeScript, API RESTful, JWT, middlewares, Zod, ORM e status HTTP corretos.</p>
+          </div>
+          <div class="card">
+            <h3>Frontend</h3>
+            <p>React com Functional Components, React Router, Context API, UI library, formulários e tratamento visual de estados.</p>
+          </div>
+          <div class="card">
+            <h3>Boas práticas</h3>
+            <p>Jest, Supertest, React Testing Library, organização de código, tratamento de exceções e mensagens claras.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="stack">
+        <h2>2. Stack e tecnologias obrigatórias</h2>
+        <p>
+          Para manter o desafio alinhado ao conteúdo ensinado durante o curso, os candidatos devem usar as tecnologias abaixo.
+          O objetivo é avaliar exatamente os conhecimentos trabalhados em aula, evitando stacks muito diferentes ou soluções prontas que fujam da proposta.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Camada</th>
+                <th>Tecnologia esperada</th>
+                <th>O que deve ser avaliado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Linguagem</td>
+                <td><strong>JavaScript e TypeScript</strong></td>
+                <td>Uso correto de tipos, objetos, arrays, funções, estruturas de controle, tratamento de exceções e organização do código.</td>
+              </tr>
+              <tr>
+                <td>Backend</td>
+                <td><strong>Node.js + Express.js</strong></td>
+                <td>Criação de API RESTful, rotas, controllers, middlewares, métodos HTTP e status codes adequados.</td>
+              </tr>
+              <tr>
+                <td>Validação</td>
+                <td><strong>Zod</strong></td>
+                <td>Validação de body, params e query params antes de executar regras de negócio.</td>
+              </tr>
+              <tr>
+                <td>Autenticação</td>
+                <td><strong>JWT</strong></td>
+                <td>Login, geração de token, middleware de autenticação e proteção de rotas privadas.</td>
+              </tr>
+              <tr>
+                <td>Banco de dados</td>
+                <td><strong>Prisma ou Sequelize</strong></td>
+                <td>Modelagem das entidades, relacionamentos, migrations/estrutura inicial e consultas básicas.</td>
+              </tr>
+              <tr>
+                <td>Datas</td>
+                <td><strong>DayJS ou Intl</strong></td>
+                <td>Manipulação e exibição correta de datas como data da despesa, criação, atualização e histórico.</td>
+              </tr>
+              <tr>
+                <td>Testes backend</td>
+                <td><strong>Jest + Supertest</strong></td>
+                <td>Testes de integração para rotas principais, autenticação, validações e regras de negócio.</td>
+              </tr>
+              <tr>
+                <td>Frontend</td>
+                <td><strong>React com Functional Components</strong></td>
+                <td>Componentização, props, useState, useEffect, Hooks seguros e separação de responsabilidades.</td>
+              </tr>
+              <tr>
+                <td>Navegação</td>
+                <td><strong>React Router</strong></td>
+                <td>Rotas públicas, rotas privadas, navegação entre listagem, cadastro, edição, detalhe e login.</td>
+              </tr>
+              <tr>
+                <td>Estado global</td>
+                <td><strong>Context API</strong></td>
+                <td>Controle de usuário autenticado, token, perfil e permissões no frontend.</td>
+              </tr>
+              <tr>
+                <td>UI e estilos</td>
+                <td><strong>Chakra UI, Bootstrap, Material UI ou ShadcnUI + SCSS/CSS</strong></td>
+                <td>Uso consistente de componentes visuais, formulários, feedbacks, layout responsivo e design system básico.</td>
+              </tr>
+              <tr>
+                <td>Testes frontend</td>
+                <td><strong>Jest + React Testing Library</strong></td>
+                <td>Testes de componentes, formulários, renderização condicional por perfil e mensagens de erro.</td>
+              </tr>
+              <tr>
+                <td>Consumo de API</td>
+                <td><strong>Axios ou Fetch API</strong></td>
+                <td>Integração do frontend com a API, tratamento de loading, sucesso, erro e autenticação.</td>
+              </tr>
+              <tr>
+                <td>Teste manual de API</td>
+                <td><strong>Postman</strong></td>
+                <td>Opcionalmente entregar collection ou documentação simples das rotas para facilitar avaliação.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="highlight">
+          O desafio não exige tecnologias avançadas além da ementa. A avaliação deve priorizar clareza, funcionamento correto,
+          validações, permissões, tratamento de erros e organização do código.
+        </div>
+      </section>
+
+      <section id="fora-escopo">
+        <h2>3. Restrições e itens fora de escopo</h2>
+        <p>
+          Para evitar ambiguidades, os itens abaixo não devem ser exigidos como obrigatórios. Eles podem aparecer apenas como diferencial,
+          desde que o candidato implemente primeiro o fluxo principal.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Orientação</th>
+                <th>Motivo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Upload real em storage externo</td>
+                <td>Não obrigatório. Pode salvar apenas nome, tipo e URL simulada do arquivo.</td>
+                <td>Storage externo não foi foco da ementa.</td>
+              </tr>
+              <tr>
+                <td>Refresh token</td>
+                <td>Não obrigatório. Pode ser considerado plus.</td>
+                <td>A ementa cobre JWT, mas não necessariamente fluxo completo de renovação.</td>
+              </tr>
+              <tr>
+                <td>Docker Compose</td>
+                <td>Não obrigatório. Pode ser considerado plus.</td>
+                <td>Não consta como conteúdo central da ementa.</td>
+              </tr>
+              <tr>
+                <td>Arquiteturas complexas</td>
+                <td>Não exigir Clean Architecture, DDD ou microsserviços.</td>
+                <td>O foco é API REST, Express, validações, ORM, React e boas práticas básicas.</td>
+              </tr>
+              <tr>
+                <td>Bibliotecas avançadas de estado</td>
+                <td>Preferir Context API. Jotai pode ser aceito, mas não deve ser exigido.</td>
+                <td>Context API foi explicitamente ensinado.</td>
+              </tr>
+              <tr>
+                <td>Integrações externas reais</td>
+                <td>Não obrigatório. Pode haver consumo simples de API externa como plus.</td>
+                <td>Foi ensinado consumo de APIs externas, mas o núcleo do desafio é CRUD e regras.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="warning">
+          O candidato não deve ser penalizado por não implementar itens fora da ementa. A pontuação principal deve estar nos fundamentos:
+          REST, JWT, RBAC, Zod, ORM, React, formulários, rotas, Context API e tratamento de erros.
+        </div>
+      </section>
+
+      <section id="contexto">
+        <h2>4. Contexto do sistema</h2>
+        <p>O sistema deve seguir o fluxo principal abaixo:</p>
+
+        <div class="grid grid-3">
+          <div class="card">
+            <h3>1. Solicitação</h3>
+            <p>O colaborador cadastra uma solicitação de reembolso informando categoria, descrição, valor, data da despesa e anexos quando necessário.</p>
+          </div>
+          <div class="card">
+            <h3>2. Análise</h3>
+            <p>O gestor visualiza solicitações enviadas e pode aprovar ou rejeitar. Em caso de rejeição, a justificativa é obrigatória.</p>
+          </div>
+          <div class="card">
+            <h3>3. Pagamento</h3>
+            <p>O financeiro visualiza solicitações aprovadas e marca como pagas. Solicitações pagas não podem mais ser alteradas.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="perfis">
+        <h2>5. Perfis de usuário</h2>
+        <p>Cada usuário deve possuir exatamente um perfil. O perfil define quais ações ele pode executar no sistema.</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Perfil</th>
+                <th>Permissões esperadas</th>
+                <th>Restrições importantes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="badge badge-blue">COLABORADOR</span></td>
+                <td>Cria solicitações, edita solicitações próprias enquanto permitido e visualiza suas próprias solicitações.</td>
+                <td>Não pode aprovar, rejeitar, pagar ou visualizar solicitações de outros colaboradores.</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-purple">GESTOR</span></td>
+                <td>Visualiza solicitações enviadas, aprova solicitações e rejeita solicitações com justificativa.</td>
+                <td>Não pode marcar solicitações como pagas.</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-green">FINANCEIRO</span></td>
+                <td>Visualiza solicitações aprovadas e marca solicitações aprovadas como pagas.</td>
+                <td>Não pode aprovar, rejeitar ou editar solicitações de reembolso.</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-gray">ADMIN</span></td>
+                <td>Gerencia usuários, gerencia categorias e pode visualizar dados gerais do sistema.</td>
+                <td>Não substitui automaticamente o papel operacional de gestor ou financeiro, salvo se o candidato documentar essa decisão.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="entidades">
+        <h2>6. Entidades do sistema</h2>
+        <p>O candidato deve modelar, no mínimo, as entidades abaixo.</p>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <h3>Usuário</h3>
+            <ul>
+              <li>id</li>
+              <li>nome</li>
+              <li>email</li>
+              <li>senha</li>
+              <li>perfil</li>
+              <li>criadoEm</li>
+              <li>atualizadoEm</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>Categoria</h3>
+            <ul>
+              <li>id</li>
+              <li>nome</li>
+              <li>ativo</li>
+              <li>criadoEm</li>
+              <li>atualizadoEm</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>Solicitação de Reembolso</h3>
+            <ul>
+              <li>id</li>
+              <li>solicitanteId</li>
+              <li>categoriaId</li>
+              <li>descricao</li>
+              <li>valor</li>
+              <li>dataDespesa</li>
+              <li>status</li>
+              <li>justificativaRejeicao</li>
+              <li>criadoEm</li>
+              <li>atualizadoEm</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>Anexo</h3>
+            <ul>
+              <li>id</li>
+              <li>solicitacaoId</li>
+              <li>nomeArquivo</li>
+              <li>urlArquivo</li>
+              <li>tipoArquivo</li>
+              <li>criadoEm</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>Histórico da Solicitação</h3>
+            <ul>
+              <li>id</li>
+              <li>solicitacaoId</li>
+              <li>usuarioId</li>
+              <li>acao</li>
+              <li>observacao</li>
+              <li>criadoEm</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="historico">
+        <h2>7. Entidade Histórico da Solicitação</h2>
+        <p>
+          Toda ação importante executada em uma solicitação deve gerar um registro de histórico.
+          O histórico funciona como uma trilha de auditoria e deve permitir entender o que aconteceu,
+          quem fez, quando fez e qual foi a observação associada.
+        </p>
+
+        <div class="highlight">
+          Todo registro de histórico deve armazenar:
+          <strong>quem fez</strong>, <strong>qual ação foi realizada</strong>, <strong>em qual momento</strong>
+          e <strong>alguma observação sobre a ação</strong>.
+        </div>
+
+        <h3>Exemplos obrigatórios</h3>
+        <pre><code>// Quando uma solicitação for aprovada:
+{
+  "solicitacaoId": "id-da-solicitacao",
+  "usuarioId": "id-do-gestor-logado",
+  "acao": "APPROVED",
+  "criadoEm": "data/hora atual",
+  "observacao": "Solicitação aprovada pelo gestor"
+}
+
+// Quando uma solicitação for paga:
+{
+  "solicitacaoId": "id-da-solicitacao",
+  "usuarioId": "id-do-financeiro-logado",
+  "acao": "PAID",
+  "criadoEm": "data/hora atual",
+  "observacao": "Pagamento realizado pelo financeiro"
+}</code></pre>
+      </section>
+
+      <section id="status">
+        <h2>8. Status possíveis da solicitação</h2>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Descrição</th>
+                <th>Pode editar?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="badge badge-gray">RASCUNHO</span></td>
+                <td>Solicitação criada, mas ainda não enviada para análise.</td>
+                <td>Sim, apenas pelo colaborador dono da solicitação.</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-blue">ENVIADO</span></td>
+                <td>Solicitação enviada para análise do gestor.</td>
+                <td>Não deve ser editada, salvo se o candidato justificar outra decisão.</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-green">APROVADO</span></td>
+                <td>Solicitação aprovada pelo gestor.</td>
+                <td>Não.</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-red">REJEITADO</span></td>
+                <td>Solicitação rejeitada pelo gestor, obrigatoriamente com justificativa.</td>
+                <td>Não.</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-yellow">PAGO</span></td>
+                <td>Solicitação aprovada e marcada como paga pelo financeiro.</td>
+                <td>Não.</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-gray">CANCELADO</span></td>
+                <td>Solicitação cancelada pelo colaborador, se ainda permitido.</td>
+                <td>Não.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="acoes">
+        <h2>9. Ações possíveis no histórico</h2>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Ação</th>
+                <th>Quando registrar</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>CREATED</code></td>
+                <td>Quando uma solicitação de reembolso for criada.</td>
+              </tr>
+              <tr>
+                <td><code>UPDATED</code></td>
+                <td>Quando uma solicitação em RASCUNHO for alterada pelo colaborador dono.</td>
+              </tr>
+              <tr>
+                <td><code>SUBMITTED</code></td>
+                <td>Quando uma solicitação mudar de RASCUNHO para ENVIADO.</td>
+              </tr>
+              <tr>
+                <td><code>APPROVED</code></td>
+                <td>Quando um gestor aprovar uma solicitação ENVIADA.</td>
+              </tr>
+              <tr>
+                <td><code>REJECTED</code></td>
+                <td>Quando um gestor rejeitar uma solicitação ENVIADA, com justificativa obrigatória.</td>
+              </tr>
+              <tr>
+                <td><code>PAID</code></td>
+                <td>Quando o financeiro marcar uma solicitação APROVADA como PAGA.</td>
+              </tr>
+              <tr>
+                <td><code>CANCELED</code></td>
+                <td>Quando o colaborador cancelar uma solicitação própria, se o status permitir.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="regras-detalhadas">
+        <h2>10. Regras de negócio detalhadas</h2>
+        <p>
+          As regras abaixo devem ser implementadas de forma explícita no backend.
+          O frontend também deve refletir essas restrições, escondendo ou desabilitando ações quando possível.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Entidade</th>
+                <th>Ação</th>
+                <th>Regra obrigatória</th>
+                <th>Perfil permitido</th>
+                <th>Erro esperado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Solicitação de Reembolso</td>
+                <td>Criar</td>
+                <td>O valor deve ser maior que zero, a data da despesa é obrigatória e a categoria deve existir e estar ativa.</td>
+                <td>COLABORADOR</td>
+                <td>400 Bad Request para campos inválidos; 401 se não autenticado.</td>
+              </tr>
+              <tr>
+                <td>Solicitação de Reembolso</td>
+                <td>Editar</td>
+                <td>O colaborador só pode editar solicitações próprias e apenas enquanto estiverem em status RASCUNHO.</td>
+                <td>COLABORADOR</td>
+                <td>403 Forbidden se não for dono; 400 Bad Request se o status não permitir edição; 404 se não existir.</td>
+              </tr>
+              <tr>
+                <td>Solicitação de Reembolso</td>
+                <td>Enviar para análise</td>
+                <td>Apenas solicitações em RASCUNHO podem ser enviadas. Após envio, o status deve mudar para ENVIADO e gerar histórico SUBMITTED.</td>
+                <td>COLABORADOR dono</td>
+                <td>400 Bad Request para transição inválida; 403 se não for dono; 404 se não existir.</td>
+              </tr>
+              <tr>
+                <td>Solicitação de Reembolso</td>
+                <td>Aprovar</td>
+                <td>Apenas solicitações com status ENVIADO podem ser aprovadas. Ao aprovar, o status deve mudar para APROVADO e gerar histórico APPROVED.</td>
+                <td>GESTOR</td>
+                <td>403 Forbidden para perfil inválido; 400 Bad Request para status inválido; 404 se não existir.</td>
+              </tr>
+              <tr>
+                <td>Solicitação de Reembolso</td>
+                <td>Rejeitar</td>
+                <td>Apenas solicitações com status ENVIADO podem ser rejeitadas. A justificativa de rejeição é obrigatória.</td>
+                <td>GESTOR</td>
+                <td>400 Bad Request se faltar justificativa ou status for inválido; 403 para perfil inválido; 404 se não existir.</td>
+              </tr>
+              <tr>
+                <td>Solicitação de Reembolso</td>
+                <td>Marcar como paga</td>
+                <td>Apenas solicitações com status APROVADO podem ser pagas. Ao pagar, o status deve mudar para PAGO e gerar histórico PAID.</td>
+                <td>FINANCEIRO</td>
+                <td>403 Forbidden para perfil inválido; 400 Bad Request se não estiver aprovada; 404 se não existir.</td>
+              </tr>
+              <tr>
+                <td>Solicitação de Reembolso</td>
+                <td>Cancelar</td>
+                <td>O colaborador só pode cancelar solicitações próprias em RASCUNHO. Opcionalmente, pode cancelar ENVIADO se a regra for documentada.</td>
+                <td>COLABORADOR dono</td>
+                <td>400 Bad Request para status inválido; 403 se não for dono; 404 se não existir.</td>
+              </tr>
+              <tr>
+                <td>Categoria</td>
+                <td>Criar/editar</td>
+                <td>Categorias devem possuir nome obrigatório. Uma categoria inativa não pode ser usada em novas solicitações.</td>
+                <td>ADMIN</td>
+                <td>400 Bad Request para campos inválidos; 403 para perfil inválido; 404 ao editar categoria inexistente.</td>
+              </tr>
+              <tr>
+                <td>Categoria</td>
+                <td>Usar em solicitação</td>
+                <td>A categoria informada em uma solicitação deve existir e estar ativa.</td>
+                <td>COLABORADOR</td>
+                <td>400 Bad Request para categoria inválida ou inativa.</td>
+              </tr>
+              <tr>
+                <td>Anexo</td>
+                <td>Upload</td>
+                <td>O anexo deve estar vinculado a uma solicitação existente. Tipos permitidos devem ser definidos, por exemplo: PDF, JPG e PNG.</td>
+                <td>COLABORADOR dono</td>
+                <td>404 Not Found se a solicitação não existir; 400 Bad Request para tipo inválido; 403 se não for dono.</td>
+              </tr>
+              <tr>
+                <td>Histórico da Solicitação</td>
+                <td>Registrar ação</td>
+                <td>Toda ação relevante deve gerar histórico contendo solicitação, usuário, ação, data/hora e observação.</td>
+                <td>Sistema</td>
+                <td>A ausência de histórico será considerada falha de implementação.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="danger-note">
+          Não é aceitável retornar sucesso para ações inválidas. Exemplo: tentar pagar uma solicitação ENVIADA deve retornar erro,
+          e não simplesmente ignorar a ação ou responder 200.
+        </div>
+      </section>
+
+      <section id="validacoes">
+        <h2>11. Validações obrigatórias</h2>
+
+        <ul class="checklist">
+          <li><code>valor</code> deve ser maior que zero.</li>
+          <li><code>dataDespesa</code> é obrigatória.</li>
+          <li><code>categoriaId</code> deve ser válido.</li>
+          <li><code>status</code> deve ser válido.</li>
+          <li><code>justificativaRejeicao</code> é obrigatória ao rejeitar.</li>
+          <li>Usuário autenticado é obrigatório para rotas privadas.</li>
+          <li>Permissão adequada deve ser validada em cada ação.</li>
+          <li>Anexos devem ter tipo de arquivo permitido.</li>
+          <li>Transições inválidas de status devem ser bloqueadas.</li>
+          <li>E-mail de usuário deve ter formato válido.</li>
+          <li>Senha não deve ser salva em texto puro.</li>
+          <li>IDs inexistentes devem retornar 404.</li>
+        </ul>
+      </section>
+
+      <section id="transicoes">
+        <h2>12. Transições de status</h2>
+        <p>O sistema deve respeitar o fluxo abaixo. Transições fora desse fluxo devem ser bloqueadas.</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Origem</th>
+                <th>Destino</th>
+                <th>Ação</th>
+                <th>Quem pode fazer</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>RASCUNHO</td>
+                <td>ENVIADO</td>
+                <td>Enviar para análise</td>
+                <td>COLABORADOR dono</td>
+              </tr>
+              <tr>
+                <td>ENVIADO</td>
+                <td>APROVADO</td>
+                <td>Aprovar</td>
+                <td>GESTOR</td>
+              </tr>
+              <tr>
+                <td>ENVIADO</td>
+                <td>REJEITADO</td>
+                <td>Rejeitar com justificativa</td>
+                <td>GESTOR</td>
+              </tr>
+              <tr>
+                <td>APROVADO</td>
+                <td>PAGO</td>
+                <td>Marcar como pago</td>
+                <td>FINANCEIRO</td>
+              </tr>
+              <tr>
+                <td>RASCUNHO</td>
+                <td>CANCELADO</td>
+                <td>Cancelar</td>
+                <td>COLABORADOR dono</td>
+              </tr>
+              <tr>
+                <td>ENVIADO</td>
+                <td>CANCELADO</td>
+                <td>Cancelar, se permitido pela regra implementada</td>
+                <td>COLABORADOR dono</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="erros">
+        <h2>13. Tratamento de erros e boas práticas de API</h2>
+        <p>
+          Além das funcionalidades principais, serão avaliadas boas práticas de backend e frontend,
+          incluindo respostas HTTP coerentes, mensagens claras e tratamento visual dos erros na interface.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Cenário</th>
+                <th>Status HTTP esperado</th>
+                <th>Exemplo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Campos inválidos</td>
+                <td><code>400 Bad Request</code></td>
+                <td>Valor menor ou igual a zero, data vazia, categoria inválida, justificativa ausente.</td>
+              </tr>
+              <tr>
+                <td>Usuário não autenticado</td>
+                <td><code>401 Unauthorized</code></td>
+                <td>Token JWT ausente, inválido ou expirado.</td>
+              </tr>
+              <tr>
+                <td>Usuário sem permissão</td>
+                <td><code>403 Forbidden</code></td>
+                <td>Colaborador tentando aprovar, gestor tentando pagar ou financeiro tentando rejeitar.</td>
+              </tr>
+              <tr>
+                <td>Recurso não encontrado</td>
+                <td><code>404 Not Found</code></td>
+                <td>Solicitação, usuário, categoria ou anexo inexistente.</td>
+              </tr>
+              <tr>
+                <td>Transição de status inválida</td>
+                <td><code>400 Bad Request</code></td>
+                <td>Tentar pagar uma solicitação ENVIADA ou rejeitar uma solicitação PAGA.</td>
+              </tr>
+              <tr>
+                <td>Erro inesperado</td>
+                <td><code>500 Internal Server Error</code></td>
+                <td>Erro não tratado no servidor.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Formato sugerido de resposta de erro</h3>
+        <pre><code>{
+  "message": "Categoria não encontrada ou inativa",
+  "statusCode": 400,
+  "error": "Bad Request"
+}</code></pre>
+
+        <h3>Comportamento esperado no frontend</h3>
+        <ul>
+          <li>Exibir mensagens de erro de forma visual e clara para o usuário.</li>
+          <li>Destacar campos inválidos nos formulários.</li>
+          <li>Exibir mensagens de sucesso após ações concluídas.</li>
+          <li>Impedir ações não permitidas na interface quando possível.</li>
+          <li>Tratar estados de carregamento, erro e lista vazia.</li>
+          <li>Não deixar erros técnicos aparecerem de forma crua para o usuário final.</li>
+          <li>Redirecionar para login quando o token estiver ausente ou expirado.</li>
+        </ul>
+      </section>
+
+      <section id="backend">
+        <h2>14. Funcionalidades obrigatórias do backend</h2>
+
+        <ul class="checklist">
+          <li>API RESTful com Node.js, Express.js e TypeScript.</li>
+          <li>Login com JWT.</li>
+          <li>Cadastro de usuário.</li>
+          <li>Middleware de autenticação.</li>
+          <li>Middleware de permissão por perfil.</li>
+          <li>Validação de body, params e query params com Zod.</li>
+          <li>CRUD de categorias.</li>
+          <li>CRUD de solicitações de reembolso.</li>
+          <li>Modelagem com Prisma ou Sequelize.</li>
+          <li>Manipulação de datas com DayJS ou Intl.</li>
+          <li>Upload/listagem simples de anexos, podendo ser simulado.</li>
+          <li>Envio da solicitação.</li>
+          <li>Aprovação de solicitação.</li>
+          <li>Rejeição com justificativa.</li>
+          <li>Marcação como pago.</li>
+          <li>Listagem do histórico da solicitação.</li>
+          <li>Tratamento adequado de erros HTTP.</li>
+          <li>Testes de integração com Jest e Supertest para rotas principais.</li>
+        </ul>
+      </section>
+
+      <section id="frontend">
+        <h2>15. Funcionalidades obrigatórias do frontend</h2>
+        <p>O frontend deve ser implementado em React usando Functional Components, Hooks, React Router para navegação e Context API para autenticação/perfil. Para UI, o candidato pode usar Chakra UI, Bootstrap, Material UI, ShadcnUI ou SCSS/CSS próprio.</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Tela</th>
+                <th>Objetivo</th>
+                <th>Cuidados esperados</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Login</td>
+                <td>Autenticar usuário, salvar token e atualizar o contexto global de autenticação.</td>
+                <td>Exibir erro para credenciais inválidas.</td>
+              </tr>
+              <tr>
+                <td>Cadastro</td>
+                <td>Criar usuário.</td>
+                <td>Validar campos obrigatórios e e-mail.</td>
+              </tr>
+              <tr>
+                <td>Dashboard/Listagem</td>
+                <td>Listar solicitações conforme o perfil usando chamada à API com Axios ou Fetch.</td>
+                <td>Exibir loading, erro e estado vazio.</td>
+              </tr>
+              <tr>
+                <td>Nova solicitação</td>
+                <td>Criar solicitação de reembolso.</td>
+                <td>Validar valor, data, categoria e descrição no frontend e tratar erros retornados pelo backend.</td>
+              </tr>
+              <tr>
+                <td>Editar solicitação</td>
+                <td>Editar solicitação própria em RASCUNHO.</td>
+                <td>Bloquear edição quando o status não permitir.</td>
+              </tr>
+              <tr>
+                <td>Detalhe da solicitação</td>
+                <td>Visualizar dados completos, anexos e status.</td>
+                <td>Mostrar ações disponíveis conforme perfil e status.</td>
+              </tr>
+              <tr>
+                <td>Histórico</td>
+                <td>Visualizar trilha de auditoria.</td>
+                <td>Exibir ação, usuário, data/hora e observação.</td>
+              </tr>
+              <tr>
+                <td>Aprovação/Rejeição</td>
+                <td>Permitir ação do gestor.</td>
+                <td>Exigir justificativa ao rejeitar.</td>
+              </tr>
+              <tr>
+                <td>Pagamento</td>
+                <td>Permitir marcação como pago pelo financeiro.</td>
+                <td>Permitir apenas solicitações APROVADAS.</td>
+              </tr>
+              <tr>
+                <td>Gestão de categorias</td>
+                <td>Admin cria, edita e inativa categorias.</td>
+                <td>Não permitir uso de categoria inativa em novas solicitações.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="endpoints">
+        <h2>16. Endpoints sugeridos</h2>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Método</th>
+                <th>Rota</th>
+                <th>Descrição</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>POST</td><td><code>/auth/login</code></td><td>Autentica usuário e retorna token JWT.</td></tr>
+              <tr><td>POST</td><td><code>/users</code></td><td>Cria usuário.</td></tr>
+              <tr><td>GET</td><td><code>/users</code></td><td>Lista usuários. Recomendado para ADMIN.</td></tr>
+              <tr><td>GET</td><td><code>/categories</code></td><td>Lista categorias.</td></tr>
+              <tr><td>POST</td><td><code>/categories</code></td><td>Cria categoria. Recomendado para ADMIN.</td></tr>
+              <tr><td>PUT</td><td><code>/categories/:id</code></td><td>Atualiza categoria. Recomendado para ADMIN.</td></tr>
+              <tr><td>GET</td><td><code>/reimbursements</code></td><td>Lista solicitações conforme perfil do usuário.</td></tr>
+              <tr><td>POST</td><td><code>/reimbursements</code></td><td>Cria solicitação de reembolso.</td></tr>
+              <tr><td>GET</td><td><code>/reimbursements/:id</code></td><td>Detalha solicitação específica.</td></tr>
+              <tr><td>PUT</td><td><code>/reimbursements/:id</code></td><td>Edita solicitação quando permitido.</td></tr>
+              <tr><td>POST</td><td><code>/reimbursements/:id/submit</code></td><td>Envia solicitação para análise.</td></tr>
+              <tr><td>POST</td><td><code>/reimbursements/:id/approve</code></td><td>Aprova solicitação enviada.</td></tr>
+              <tr><td>POST</td><td><code>/reimbursements/:id/reject</code></td><td>Rejeita solicitação enviada com justificativa.</td></tr>
+              <tr><td>POST</td><td><code>/reimbursements/:id/pay</code></td><td>Marca solicitação aprovada como paga.</td></tr>
+              <tr><td>GET</td><td><code>/reimbursements/:id/history</code></td><td>Lista histórico da solicitação.</td></tr>
+              <tr><td>POST</td><td><code>/reimbursements/:id/attachments</code></td><td>Faz upload de anexo.</td></tr>
+              <tr><td>GET</td><td><code>/reimbursements/:id/attachments</code></td><td>Lista anexos da solicitação.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="plus">
+        <h2>17. Plus / diferenciais</h2>
+        <p>Os itens abaixo não são obrigatórios, mas serão considerados diferenciais positivos desde que o fluxo principal esteja funcionando.</p>
+
+        <ul class="checklist">
+          <li>Paginação.</li>
+          <li>Filtro por status.</li>
+          <li>Filtro por categoria.</li>
+          <li>Busca por colaborador.</li>
+          <li>Ordenação por data ou valor.</li>
+          <li>Dashboard com totais.</li>
+          <li>Preview/download de anexos.</li>
+          <li>Soft delete.</li>
+          <li>Seeds iniciais.</li>
+          <li>Collection do Postman.</li>
+          <li>Mais testes automatizados no backend.</li>
+          <li>Mais testes automatizados no frontend.</li>
+          <li>Consumo simples de API externa para demonstrar Axios/Fetch, desde que não atrapalhe o escopo principal.</li>
+          <li>Refresh token.</li>
+          <li>Docker Compose.</li>
+          <li>Upload real de comprovantes.</li>
+          <li>Limite de valor configurável por categoria.</li>
+          <li>Bloqueio de despesas futuras.</li>
+          <li>Bloqueio de solicitação sem anexo acima de determinado valor.</li>
+        </ul>
+
+        <div class="warning">
+          Docker, refresh token e upload real não fazem parte do escopo obrigatório. Eles só devem contar como diferencial,
+          não como critério eliminatório.
+        </div>
+      </section>
+
+      <section id="avaliacao">
+        <h2>18. Critérios de avaliação</h2>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Critério</th>
+                <th>O que será observado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Modelagem de dados</td><td>Entidades, relacionamentos, campos obrigatórios e coerência da estrutura.</td></tr>
+              <tr><td>CRUD funcionando</td><td>Criação, leitura, atualização e listagem das entidades principais.</td></tr>
+              <tr><td>Autenticação JWT</td><td>Login, proteção de rotas e identificação do usuário logado.</td></tr>
+              <tr><td>Express e REST</td><td>Uso correto de rotas, controllers, middlewares, métodos HTTP e status codes.</td></tr>
+              <tr><td>Zod</td><td>Validação clara de body, params e query antes das regras de negócio.</td></tr>
+              <tr><td>ORM</td><td>Uso adequado de Prisma ou Sequelize para persistência e relacionamentos.</td></tr>
+              <tr><td>RBAC</td><td>Controle correto de permissões por perfil.</td></tr>
+              <tr><td>Validações</td><td>Validação de campos obrigatórios, tipos, regras e transições.</td></tr>
+              <tr><td>Regras de negócio</td><td>Aplicação correta das regras por entidade, ação, status e perfil.</td></tr>
+              <tr><td>Histórico/auditoria</td><td>Registro correto de quem fez, qual ação, quando e observação.</td></tr>
+              <tr><td>Tratamento de erros da API</td><td>Uso correto de 400, 401, 403, 404 e 500, com mensagens claras.</td></tr>
+              <tr><td>Tratamento visual de erros</td><td>Exibição de erros, validações, feedbacks de sucesso, loading e estados vazios.</td></tr>
+              <tr><td>Organização do código</td><td>Separação de responsabilidades, legibilidade, nomes claros e estrutura consistente.</td></tr>
+              <tr><td>Interface funcional</td><td>Telas usáveis, ações coerentes, formulários claros e navegação simples.</td></tr>
+              <tr><td>React Router e Context API</td><td>Rotas públicas/privadas, controle de usuário logado, perfil e permissões no frontend.</td></tr>
+              <tr><td>Testes</td><td>Testes mínimos com Jest, Supertest e/ou React Testing Library cobrindo fluxos relevantes.</td></tr>
+              <tr><td>Clareza da entrega</td><td>README, instruções de execução e dados de teste.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="entrega">
+        <h2>19. Entrega esperada</h2>
+        <p>O candidato deve entregar:</p>
+
+        <ul>
+          <li>Código fonte em repositório Git.</li>
+          <li>README com instruções claras.</li>
+          <li>Script ou instrução para rodar o projeto.</li>
+          <li>Informações de usuários de teste.</li>
+          <li>Explicação das decisões técnicas.</li>
+          <li>Informar quais tecnologias da ementa foram utilizadas.</li>
+          <li>Opcional: collection do Postman para facilitar testes da API.</li>
+          <li>Lista do que foi implementado e do que ficou pendente, se houver.</li>
+        </ul>
+
+        <div class="warning">
+          A entrega será melhor avaliada se uma pessoa avaliadora conseguir clonar o projeto,
+          rodar localmente e testar os principais fluxos sem precisar pedir explicações adicionais.
+        </div>
+      </section>
+
+      <div class="footer">
+        Pitang — Desafio Técnico | React + Node.js | Controle de Solicitações de Reembolso
+      </div>
+    </main>
+  </div>
+</body>
+</html>
