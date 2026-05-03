@@ -3,18 +3,14 @@ import { Box, Heading, Text, VStack } from '@chakra-ui/react';
 import { Login } from './pages/Login';
 import { useAuth } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
-
-// Páginas do Employee
 import { MyReimbursements } from './pages/employee/MyReimbursements';
 import { NewReimbursement } from './pages/employee/NewReimbursement';
-
-// Páginas do Manager e Financeiro
 import { Approvals } from './pages/manager/Approvals';
 import { Payments } from './pages/finance/Payments';
-
-// Páginas do Admin
 import { Users } from './pages/admin/Users';
+import { NewUser } from './pages/admin/NewUser';
 import { Categories } from './pages/admin/Categories';
+import { ReimbursementDetail } from './pages/ReimbursementDetail';
 
 // Componente temporário para o Dashboard
 function DashboardPlaceholder() {
@@ -24,7 +20,7 @@ function DashboardPlaceholder() {
       <Heading size="lg" color="gray.800">Dashboard</Heading>
       <Box bg="white" p={6} borderRadius="xl" boxShadow="sm" w="full" border="1px solid" borderColor="gray.100">
         <Text fontSize="lg" color="gray.600">
-          Bem-vindo ao sistema, <strong>{user?.name}</strong>! 
+          Bem-vindo ao sistema, <strong>{user?.name}</strong>!
         </Text>
         <Text mt={2} color="gray.500">
           Você está logado como: <Box as="span" color="brand.600" fontWeight="bold">{user?.role}</Box>
@@ -39,82 +35,99 @@ function App() {
 
   return (
     <Routes>
-      <Route 
-        path="/login" 
-        element={!isAuthenticated ? <Login /> : <Navigate to="/" />} 
+      <Route
+        path="/login"
+        element={!isAuthenticated ? <Login /> : <Navigate to="/" />}
       />
-      
-      <Route 
-        path="/" 
+
+      <Route
+        path="/"
         element={
           <ProtectedRoute>
             <DashboardPlaceholder />
           </ProtectedRoute>
-        } 
+        }
       />
 
       {/* Rotas do Employee */}
-      <Route 
-        path="/reimbursements" 
+      <Route
+        path="/reimbursements"
         element={
           <ProtectedRoute allowedRoles={['EMPLOYEE']}>
             <MyReimbursements />
           </ProtectedRoute>
-        } 
+        }
       />
-      <Route 
-        path="/reimbursements/new" 
+      <Route
+        path="/reimbursements/new"
         element={
           <ProtectedRoute allowedRoles={['EMPLOYEE']}>
             <NewReimbursement />
           </ProtectedRoute>
-        } 
+        }
       />
-      <Route 
-        path="/reimbursements/edit/:id" 
+      <Route
+        path="/reimbursements/edit/:id"
         element={
           <ProtectedRoute allowedRoles={['EMPLOYEE']}>
             <NewReimbursement />
           </ProtectedRoute>
-        } 
+        }
+      />
+      {/* Detalhe da solicitação — qualquer usuário autenticado, backend filtra por ownership */}
+      <Route
+        path="/reimbursements/:id"
+        element={
+          <ProtectedRoute>
+            <ReimbursementDetail />
+          </ProtectedRoute>
+        }
       />
 
       {/* Rotas do Manager */}
-      <Route 
-        path="/approvals" 
+      <Route
+        path="/approvals"
         element={
           <ProtectedRoute allowedRoles={['MANAGER']}>
             <Approvals />
           </ProtectedRoute>
-        } 
+        }
       />
 
       {/* Rotas do Financeiro */}
-      <Route 
-        path="/payments" 
+      <Route
+        path="/payments"
         element={
           <ProtectedRoute allowedRoles={['FINANCE']}>
             <Payments />
           </ProtectedRoute>
-        } 
+        }
       />
 
       {/* Rotas do Admin */}
-      <Route 
-        path="/admin/users" 
+      <Route
+        path="/admin/users"
         element={
           <ProtectedRoute allowedRoles={['ADMIN']}>
             <Users />
           </ProtectedRoute>
-        } 
+        }
       />
-      <Route 
-        path="/admin/categories" 
+      <Route
+        path="/admin/users/new"
+        element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <NewUser />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/categories"
         element={
           <ProtectedRoute allowedRoles={['ADMIN']}>
             <Categories />
           </ProtectedRoute>
-        } 
+        }
       />
 
       <Route path="*" element={<Navigate to="/" />} />

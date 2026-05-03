@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Box, Button, Flex, Heading, Table, Thead, Tbody, Tr, Th, Td, Badge, Spinner, Text, Icon } from '@chakra-ui/react';
-import { Plus, Eye } from 'lucide-react';
+import { Box, Button, Flex, Heading, Table, Thead, Tbody, Tr, Th, Td, Badge, Spinner, Text, Icon, useToast, useDisclosure, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay } from '@chakra-ui/react';
+import { Plus, Eye, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useRef } from 'react';
 import { api } from '../../services/api';
 import dayjs from 'dayjs';
 
@@ -28,7 +29,34 @@ const statusColors: Record<string, string> = {
 export function MyReimbursements() {
   const [reimbursements, setReimbursements] = useState<Reimbursement[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cancelTarget, setCancelTarget] = useState<string | null>(null);
   const navigate = useNavigate();
+  const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = useRef<HTMLButtonElement>(null);
+
+  const askCancel = (id: string) => {
+    setCancelTarget(id);
+    onOpen();
+  };
+
+  const confirmCancel = async () => {
+    if (!cancelTarget) return;
+    try {
+      await api.post(`/reimbursements/${cancelTarget}/cancel`);
+      toast({ title: 'Solicitação cancelada', status: 'success', duration: 3000 });
+      onClose();
+      setCancelTarget(null);
+      loadReimbursements();
+    } catch (err) {
+      const error = err as { response?: { data?: { error?: string } } };
+      toast({
+        title: 'Erro ao cancelar',
+        description: error.response?.data?.error || 'Tente novamente.',
+        status: 'error',
+      });
+    }
+  };
 
   const loadReimbursements = async () => {
     try {
@@ -96,31 +124,47 @@ export function MyReimbursements() {
                       <Flex gap={2} justify="flex-end">
                         {r.status === 'DRAFT' && (
                           <>
-                            <Button 
-                              size="sm" 
+                            <Button
+                              size="sm"
                               colorScheme="gray"
                               variant="outline"
                               onClick={() => navigate(`/reimbursements/edit/${r.id}`)}
                             >
                               Editar
                             </Button>
-                            <Button 
-                              size="sm" 
-                              colorScheme="blue" 
+                            <Button
+                              size="sm"
+                              colorScheme="blue"
                               onClick={async () => {
                                 try {
                                   await api.post(`/reimbursements/${r.id}/submit`);
                                   loadReimbursements();
                                 } catch (e) {
-                                  alert('Erro ao enviar');
-                                }
+                                    const error = e as { response?: { data?: { error?: string } } };
+                                    toast({
+                                      title: 'Erro ao enviar',
+                                      description: error.response?.data?.error || 'Tente novamente.',
+                                      status: 'error',
+                                      duration: 3000,});
+                                  }
                               }}
                             >
                               Enviar
                             </Button>
                           </>
                         )}
-                        <Button size="sm" variant="ghost" colorScheme="brand" onClick={() => alert('Em breve: Detalhes')}>
+                        {(r.status === 'DRAFT' || r.status === 'SUBMITTED') && (
+                          <Button
+                            size="sm"
+                            colorScheme="orange"
+                            variant="outline"
+                            leftIcon={<Icon as={XCircle} boxSize={4} />}
+                            onClick={() => askCancel(r.id)}
+                          >
+                            Cancelar
+                          </Button>
+                        )}
+                        <Button size="sm" variant="ghost" colorScheme="brand" onClick={() => navigate(`/reimbursements/${r.id}`)}>
                           <Icon as={Eye} />
                         </Button>
                       </Flex>
@@ -132,6 +176,28 @@ export function MyReimbursements() {
           </Box>
         )}
       </Box>
+
+      {/* Diálogo de confirmação para cancelar */}
+      <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose}>
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Cancelar solicitação?
+            </AlertDialogHeader>
+            <AlertDialogBody>
+              Essa ação muda o status para CANCELED e não pode ser desfeita.
+            </AlertDialogBody>
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onClose}>
+                Voltar
+              </Button>
+              <Button colorScheme="orange" onClick={confirmCancel} ml={3}>
+                Sim, cancelar
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Box>
   );
 }

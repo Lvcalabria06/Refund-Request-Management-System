@@ -46,10 +46,10 @@ export function Login() {
     try {
       setIsLoading(true);
       const response = await api.post('/auth/login', data);
-      
+
       const { token, user } = response.data;
       login(token, user);
-      
+
       toast({
         title: 'Login realizado com sucesso!',
         description: `Bem-vindo de volta, ${user.name}.`,
@@ -58,7 +58,7 @@ export function Login() {
         isClosable: true,
         position: 'top-right',
       });
-      
+
       navigate('/');
     } catch (err) {
       const error = err as { response?: { data?: { error?: string } } };
@@ -151,7 +151,7 @@ export function Login() {
               Contas de teste padrão:
             </Text>
             <Text fontSize="xs" color="gray.400" mt={1}>
-              emp@test.com | mgr@test.com | fin@test.com<br/>
+              emp@test.com | mgr@test.com | fin@test.com<br />
               Senha: 123456
             </Text>
           </Box>

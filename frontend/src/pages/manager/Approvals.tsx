@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Box, Button, Flex, Heading, Table, Thead, Tbody, Tr, Th, Td, Spinner, Text, Icon, useToast, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Textarea } from '@chakra-ui/react';
-import { Check, X } from 'lucide-react';
+import { Check, X, Eye } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 import dayjs from 'dayjs';
 
@@ -25,6 +26,7 @@ export function Approvals() {
   const [rejectReason, setRejectReason] = useState('');
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
+  const navigate = useNavigate();
 
   const loadReimbursements = async () => {
     try {
@@ -106,6 +108,9 @@ export function Approvals() {
                     <Td isNumeric fontWeight="bold">{r.amount.toFixed(2)}</Td>
                     <Td>
                       <Flex gap={2}>
+                        <Button size="sm" variant="ghost" colorScheme="brand" onClick={() => navigate(`/reimbursements/${r.id}`)}>
+                          <Icon as={Eye} boxSize={4} />
+                        </Button>
                         <Button size="sm" colorScheme="green" onClick={() => handleApprove(r.id)} leftIcon={<Icon as={Check} boxSize={4}/>}>Aprovar</Button>
                         <Button size="sm" colorScheme="red" variant="outline" onClick={() => handleRejectClick(r.id)} leftIcon={<Icon as={X} boxSize={4}/>}>Rejeitar</Button>
                       </Flex>

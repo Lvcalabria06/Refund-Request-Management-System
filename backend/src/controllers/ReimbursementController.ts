@@ -26,7 +26,19 @@ function handleError(res: Response, error: any) {
     return res.status(403).json({ error: message });
   }
 
-  return res.status(400).json({ error: message });
+  const businessRuleErrors = [
+  'Only DRAFT', 'Only SUBMITTED', 'Only APPROVED',
+  'Category is invalid', 'Expense date cannot',
+  'Attachments can only', 'reimbursements can be',
+  ];
+  const isKnownBusinessError = businessRuleErrors.some(p => message.includes(p));
+
+  if (isKnownBusinessError) {
+    return res.status(400).json({ error: message });
+  }
+
+  console.error('Unexpected error:', error);
+  return res.status(500).json({ error: 'Internal server error' });
 }
 
 export class ReimbursementController {
@@ -137,6 +149,17 @@ export class ReimbursementController {
       const validatedData = createAttachmentSchema.parse(req.body);
       const attachment = await reimbursementService.addAttachment(String(id), validatedData, user);
       res.status(201).json(attachment);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  }
+
+  async getAttachments(req: Request, res: Response) {
+    try {
+      const user = req.user!;
+      const { id } = req.params;
+      const attachments = await reimbursementService.getAttachments(String(id), user);
+      res.status(200).json(attachments);
     } catch (error: any) {
       handleError(res, error);
     }

@@ -310,6 +310,15 @@ export class ReimbursementService {
     });
   }
 
+  async getAttachments(id: string, user: { id: string; role: string }) {
+    await this.findById(id, user); // validates access
+
+    return prisma.attachment.findMany({
+      where: { reimbursementId: id },
+      orderBy: { createdAt: 'asc' },
+    });
+  }
+
   async getHistory(id: string, user: { id: string; role: string }) {
     await this.findById(id, user);
 

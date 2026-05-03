@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Box, Button, Flex, Heading, Table, Thead, Tbody, Tr, Th, Td, Spinner, Text, Icon, useToast } from '@chakra-ui/react';
-import { DollarSign } from 'lucide-react';
+import { DollarSign, Eye } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 import dayjs from 'dayjs';
 
@@ -19,6 +20,7 @@ export function Payments() {
   const [reimbursements, setReimbursements] = useState<Reimbursement[]>([]);
   const [loading, setLoading] = useState(true);
   const toast = useToast();
+  const navigate = useNavigate();
 
   const loadReimbursements = async () => {
     try {
@@ -80,9 +82,14 @@ export function Payments() {
                     <Td>{dayjs(r.expenseDate).format('DD/MM/YYYY')}</Td>
                     <Td isNumeric fontWeight="bold" color="green.600">{r.amount.toFixed(2)}</Td>
                     <Td>
-                      <Button size="sm" colorScheme="purple" onClick={() => handlePay(r.id)} leftIcon={<Icon as={DollarSign} boxSize={4}/>}>
-                        Marcar como Pago
-                      </Button>
+                      <Flex gap={2}>
+                        <Button size="sm" variant="ghost" colorScheme="brand" onClick={() => navigate(`/reimbursements/${r.id}`)}>
+                          <Icon as={Eye} boxSize={4} />
+                        </Button>
+                        <Button size="sm" colorScheme="purple" onClick={() => handlePay(r.id)} leftIcon={<Icon as={DollarSign} boxSize={4}/>}>
+                          Marcar como Pago
+                        </Button>
+                      </Flex>
                     </Td>
                   </Tr>
                 ))}

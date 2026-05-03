@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Box, Flex, Heading, Table, Thead, Tbody, Tr, Th, Td, Spinner, Text, Badge } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Icon, Table, Thead, Tbody, Tr, Th, Td, Spinner, Text, Badge } from '@chakra-ui/react';
+import { UserPlus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 
 interface User {
@@ -19,6 +21,7 @@ const roleColors: Record<string, string> = {
 export function Users() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -38,6 +41,13 @@ export function Users() {
     <Box>
       <Flex justify="space-between" align="center" mb={6}>
         <Heading size="lg" color="gray.800">Usuários do Sistema</Heading>
+        <Button
+          colorScheme="brand"
+          leftIcon={<Icon as={UserPlus} />}
+          onClick={() => navigate('/admin/users/new')}
+        >
+          Novo Usuário
+        </Button>
       </Flex>
 
       <Box bg="white" borderRadius="xl" boxShadow="sm" border="1px solid" borderColor="gray.100" overflow="hidden">
