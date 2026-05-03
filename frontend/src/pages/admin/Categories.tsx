@@ -1,0 +1,187 @@
+import { useEffect, useState } from 'react';
+import { Box, Flex, Heading, Table, Thead, Tbody, Tr, Th, Td, Spinner, Text, Badge, Button, useToast, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, FormControl, FormLabel, Input, FormErrorMessage, Icon } from '@chakra-ui/react';
+import { Plus, Edit2, Power, PowerOff } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { api } from '../../services/api';
+
+interface Category {
+  id: string;
+  name: string;
+  isActive: boolean;
+}
+
+const categorySchema = z.object({
+  name: z.string().min(3, 'O nome deve ter no mínimo 3 caracteres'),
+});
+
+type CategoryFormData = z.infer<typeof categorySchema>;
+
+export function Categories() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
+
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<CategoryFormData>({
+    resolver: zodResolver(categorySchema),
+  });
+
+  const loadCategories = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/categories');
+      setCategories(response.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const openCreateModal = () => {
+    setEditingCategory(null);
+    reset({ name: '' });
+    onOpen();
+  };
+
+  const openEditModal = (category: Category) => {
+    setEditingCategory(category);
+    reset({ name: category.name });
+    onOpen();
+  };
+
+  const onSubmitForm = async (data: CategoryFormData) => {
+    try {
+      setIsSubmitting(true);
+      if (editingCategory) {
+        // Modo Edição
+        await api.patch(`/categories/${editingCategory.id}`, { name: data.name, isActive: editingCategory.isActive });
+        toast({ title: 'Categoria atualizada!', status: 'success' });
+      } else {
+        // Modo Criação
+        await api.post('/categories', { name: data.name });
+        toast({ title: 'Categoria criada com sucesso!', status: 'success' });
+      }
+      onClose();
+      loadCategories();
+    } catch (err) {
+      const error = err as { response?: { data?: { error?: string } } };
+      toast({ title: 'Erro', description: error.response?.data?.error || 'Erro ao salvar categoria', status: 'error' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const toggleCategory = async (id: string, currentStatus: boolean, name: string) => {
+    try {
+      await api.patch(`/categories/${id}`, { name, isActive: !currentStatus });
+      toast({ title: 'Status atualizado', status: 'success' });
+      loadCategories();
+    } catch (err) {
+      const error = err as { response?: { data?: { error?: string } } };
+      toast({ title: 'Erro', description: error.response?.data?.error || 'Erro ao atualizar', status: 'error' });
+    }
+  };
+
+  return (
+    <Box>
+      <Flex justify="space-between" align="center" mb={6}>
+        <Heading size="lg" color="gray.800">Categorias de Reembolso</Heading>
+        <Button colorScheme="brand" leftIcon={<Icon as={Plus} boxSize={4}/>} onClick={openCreateModal}>
+          Nova Categoria
+        </Button>
+      </Flex>
+
+      <Box bg="white" borderRadius="xl" boxShadow="sm" border="1px solid" borderColor="gray.100" overflow="hidden">
+        {loading ? (
+          <Flex justify="center" p={10}><Spinner color="brand.500" size="xl" /></Flex>
+        ) : categories.length === 0 ? (
+          <Flex justify="center" p={10}><Text color="gray.500">Nenhuma categoria encontrada.</Text></Flex>
+        ) : (
+          <Box overflowX="auto">
+            <Table variant="simple">
+              <Thead bg="gray.50">
+                <Tr>
+                  <Th>Nome da Categoria</Th>
+                  <Th>Status</Th>
+                  <Th>Ações</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {categories.map((cat) => (
+                  <Tr key={cat.id} _hover={{ bg: 'gray.50' }}>
+                    <Td fontWeight="bold" color="gray.700">{cat.name}</Td>
+                    <Td>
+                      <Badge colorScheme={cat.isActive ? 'green' : 'red'} px={2} py={1} borderRadius="md">
+                        {cat.isActive ? 'ATIVA' : 'INATIVA'}
+                      </Badge>
+                    </Td>
+                    <Td>
+                      <Flex gap={2}>
+                        <Button 
+                          size="sm" 
+                          colorScheme="blue" 
+                          variant="ghost"
+                          leftIcon={<Icon as={Edit2} boxSize={4}/>}
+                          onClick={() => openEditModal(cat)}
+                        >
+                          Editar
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          colorScheme={cat.isActive ? 'red' : 'green'} 
+                          variant="ghost"
+                          leftIcon={<Icon as={cat.isActive ? PowerOff : Power} boxSize={4}/>}
+                          onClick={() => toggleCategory(cat.id, cat.isActive, cat.name)}
+                        >
+                          {cat.isActive ? 'Desativar' : 'Ativar'}
+                        </Button>
+                      </Flex>
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </Box>
+        )}
+      </Box>
+
+      {/* Modal de Criação / Edição */}
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <form onSubmit={handleSubmit(onSubmitForm)}>
+            <ModalHeader>{editingCategory ? 'Editar Categoria' : 'Nova Categoria'}</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <FormControl isInvalid={!!errors.name}>
+                <FormLabel>Nome da Categoria</FormLabel>
+                <Input 
+                  placeholder="Ex: Viagem, Hospedagem..." 
+                  focusBorderColor="brand.500" 
+                  {...register('name')} 
+                />
+                <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
+              </FormControl>
+            </ModalBody>
+            <ModalFooter>
+              <Button variant="ghost" mr={3} onClick={onClose}>Cancelar</Button>
+              <Button colorScheme="brand" type="submit" isLoading={isSubmitting}>
+                {editingCategory ? 'Salvar Alterações' : 'Criar Categoria'}
+              </Button>
+            </ModalFooter>
+          </form>
+        </ModalContent>
+      </Modal>
+    </Box>
+  );
+}

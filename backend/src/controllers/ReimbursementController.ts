@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { ReimbursementService } from '../services/ReimbursementService';
-import { createReimbursementSchema, rejectReimbursementSchema, createAttachmentSchema } from '../schemas/reimbursementSchema';
+import { createReimbursementSchema, updateReimbursementSchema, rejectReimbursementSchema, createAttachmentSchema } from '../schemas/reimbursementSchema';
 import { ZodError } from 'zod';
 
 const reimbursementService = new ReimbursementService();
@@ -36,6 +36,18 @@ export class ReimbursementController {
       const validatedData = createReimbursementSchema.parse(req.body);
       const reimbursement = await reimbursementService.create(employeeId, validatedData);
       res.status(201).json(reimbursement);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  }
+
+  async update(req: Request, res: Response) {
+    try {
+      const user = req.user!;
+      const { id } = req.params;
+      const validatedData = updateReimbursementSchema.parse(req.body);
+      const reimbursement = await reimbursementService.update(String(id), validatedData, user);
+      res.status(200).json(reimbursement);
     } catch (error: any) {
       handleError(res, error);
     }

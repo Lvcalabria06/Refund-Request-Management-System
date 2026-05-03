@@ -8,6 +8,7 @@ const reimbursementController = new ReimbursementController();
 reimbursementRoutes.post('/', authMiddleware, reimbursementController.create);
 reimbursementRoutes.get('/', authMiddleware, reimbursementController.getAll);
 reimbursementRoutes.get('/:id', authMiddleware, reimbursementController.getById);
+reimbursementRoutes.put('/:id', authMiddleware, reimbursementController.update);
 
 reimbursementRoutes.post('/:id/submit', authMiddleware, reimbursementController.submit);
 reimbursementRoutes.post('/:id/approve', authMiddleware, reimbursementController.approve);

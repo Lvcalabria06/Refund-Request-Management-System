@@ -18,3 +18,10 @@ export const createAttachmentSchema = z.object({
     error: () => ({ message: 'File type must be PDF, JPG or PNG' }),
   }),
 });
+
+export const updateReimbursementSchema = z.object({
+  description: z.string().min(5, 'Description must have at least 5 characters').optional(),
+  amount: z.number().positive('Amount must be greater than zero').optional(),
+  expenseDate: z.string().datetime({ message: 'Invalid expense date' }).optional(),
+  categoryId: z.string().uuid('Invalid category ID').optional(),
+});

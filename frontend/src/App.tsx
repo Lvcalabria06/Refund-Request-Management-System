@@ -1,10 +1,41 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Box, Heading, VStack, Text, Button } from '@chakra-ui/react';
+import { Box, Heading, Text, VStack } from '@chakra-ui/react';
 import { Login } from './pages/Login';
 import { useAuth } from './contexts/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
+
+// Páginas do Employee
+import { MyReimbursements } from './pages/employee/MyReimbursements';
+import { NewReimbursement } from './pages/employee/NewReimbursement';
+
+// Páginas do Manager e Financeiro
+import { Approvals } from './pages/manager/Approvals';
+import { Payments } from './pages/finance/Payments';
+
+// Páginas do Admin
+import { Users } from './pages/admin/Users';
+import { Categories } from './pages/admin/Categories';
+
+// Componente temporário para o Dashboard
+function DashboardPlaceholder() {
+  const { user } = useAuth();
+  return (
+    <VStack align="flex-start" spacing={6} w="full">
+      <Heading size="lg" color="gray.800">Dashboard</Heading>
+      <Box bg="white" p={6} borderRadius="xl" boxShadow="sm" w="full" border="1px solid" borderColor="gray.100">
+        <Text fontSize="lg" color="gray.600">
+          Bem-vindo ao sistema, <strong>{user?.name}</strong>! 
+        </Text>
+        <Text mt={2} color="gray.500">
+          Você está logado como: <Box as="span" color="brand.600" fontWeight="bold">{user?.role}</Box>
+        </Text>
+      </Box>
+    </VStack>
+  );
+}
 
 function App() {
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <Routes>
@@ -13,25 +44,80 @@ function App() {
         element={!isAuthenticated ? <Login /> : <Navigate to="/" />} 
       />
       
-      {/* Dashboard Temporário */}
       <Route 
         path="/" 
         element={
-          isAuthenticated ? (
-            <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="gray.50">
-              <VStack spacing={4} bg="white" p={8} borderRadius="xl" boxShadow="md">
-                <Heading color="brand.600">Bem-vindo, {user?.name}!</Heading>
-                <Text color="gray.600">Seu cargo é: <strong>{user?.role}</strong></Text>
-                <Button colorScheme="red" onClick={logout} mt={4}>
-                  Sair
-                </Button>
-              </VStack>
-            </Box>
-          ) : (
-            <Navigate to="/login" />
-          )
+          <ProtectedRoute>
+            <DashboardPlaceholder />
+          </ProtectedRoute>
         } 
       />
+
+      {/* Rotas do Employee */}
+      <Route 
+        path="/reimbursements" 
+        element={
+          <ProtectedRoute allowedRoles={['EMPLOYEE']}>
+            <MyReimbursements />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/reimbursements/new" 
+        element={
+          <ProtectedRoute allowedRoles={['EMPLOYEE']}>
+            <NewReimbursement />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/reimbursements/edit/:id" 
+        element={
+          <ProtectedRoute allowedRoles={['EMPLOYEE']}>
+            <NewReimbursement />
+          </ProtectedRoute>
+        } 
+      />
+
+      {/* Rotas do Manager */}
+      <Route 
+        path="/approvals" 
+        element={
+          <ProtectedRoute allowedRoles={['MANAGER']}>
+            <Approvals />
+          </ProtectedRoute>
+        } 
+      />
+
+      {/* Rotas do Financeiro */}
+      <Route 
+        path="/payments" 
+        element={
+          <ProtectedRoute allowedRoles={['FINANCE']}>
+            <Payments />
+          </ProtectedRoute>
+        } 
+      />
+
+      {/* Rotas do Admin */}
+      <Route 
+        path="/admin/users" 
+        element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <Users />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/categories" 
+        element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <Categories />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 }

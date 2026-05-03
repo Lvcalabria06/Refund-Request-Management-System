@@ -60,7 +60,8 @@ export function Login() {
       });
       
       navigate('/');
-    } catch (error: any) {
+    } catch (err) {
+      const error = err as { response?: { data?: { error?: string } } };
       toast({
         title: 'Erro ao fazer login',
         description: error.response?.data?.error || 'Credenciais inválidas.',

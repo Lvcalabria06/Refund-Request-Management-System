@@ -44,6 +44,61 @@ export class ReimbursementService {
     });
   }
 
+  async update(id: string, data: z.infer<typeof import('../schemas/reimbursementSchema').updateReimbursementSchema>, user: { id: string; role: string }) {
+    if (user.role !== 'EMPLOYEE') {
+      throw new Error('Only EMPLOYEE can update reimbursements');
+    }
+
+    const reimbursement = await this.findById(id, user);
+
+    if (reimbursement.employeeId !== user.id) {
+      throw new Error('Only the owner can update this reimbursement');
+    }
+
+    if (reimbursement.status !== 'DRAFT') {
+      throw new Error('Only DRAFT reimbursements can be updated');
+    }
+
+    if (data.categoryId) {
+      const category = await prisma.category.findUnique({
+        where: { id: data.categoryId },
+      });
+      if (!category || !category.isActive) {
+        throw new Error('Category is invalid or inactive');
+      }
+    }
+
+    if (data.expenseDate) {
+      const expenseDate = dayjs(data.expenseDate);
+      if (expenseDate.isAfter(dayjs())) {
+        throw new Error('Expense date cannot be in the future');
+      }
+    }
+
+    return prisma.$transaction(async (tx) => {
+      const updated = await tx.reimbursement.update({
+        where: { id },
+        data: {
+          description: data.description,
+          amount: data.amount,
+          expenseDate: data.expenseDate ? dayjs(data.expenseDate).toDate() : undefined,
+          categoryId: data.categoryId,
+        },
+      });
+
+      await tx.reimbursementHistory.create({
+        data: {
+          action: 'UPDATED',
+          reimbursementId: id,
+          authorId: user.id,
+          notes: 'Reimbursement details updated',
+        },
+      });
+
+      return updated;
+    });
+  }
+
   async findAll(user: { id: string; role: string }) {
     if (user.role === 'EMPLOYEE') {
       return prisma.reimbursement.findMany({
