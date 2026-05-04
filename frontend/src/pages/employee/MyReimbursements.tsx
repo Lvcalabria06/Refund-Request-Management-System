@@ -76,13 +76,13 @@ export function MyReimbursements() {
   return (
     <Box>
       <Flex justify="space-between" align="center" mb={6}>
-        <Heading size="lg" color="gray.800">Meus Reembolsos</Heading>
+        <Heading size="lg" color="gray.800">My Reimbursements</Heading>
         <Button 
           colorScheme="brand" 
           leftIcon={<Icon as={Plus} />}
           onClick={() => navigate('/reimbursements/new')}
         >
-          Nova Solicitação
+          New Request
         </Button>
       </Flex>
 
@@ -93,17 +93,17 @@ export function MyReimbursements() {
           </Flex>
         ) : reimbursements.length === 0 ? (
           <Flex justify="center" p={10}>
-            <Text color="gray.500">Nenhuma solicitação encontrada.</Text>
+            <Text color="gray.500">No requests found.</Text>
           </Flex>
         ) : (
           <Box overflowX="auto">
             <Table variant="simple">
               <Thead bg="gray.50">
                 <Tr>
-                  <Th>Descrição</Th>
-                  <Th>Categoria</Th>
-                  <Th>Data da Despesa</Th>
-                  <Th isNumeric>Valor (R$)</Th>
+                  <Th>Description</Th>
+                  <Th>Category</Th>
+                  <Th>Expense Date</Th>
+                  <Th isNumeric>Amount (R$)</Th>
                   <Th>Status</Th>
                   <Th></Th>
                 </Tr>
@@ -130,7 +130,7 @@ export function MyReimbursements() {
                               variant="outline"
                               onClick={() => navigate(`/reimbursements/edit/${r.id}`)}
                             >
-                              Editar
+                              Edit
                             </Button>
                             <Button
                               size="sm"
@@ -149,7 +149,7 @@ export function MyReimbursements() {
                                   }
                               }}
                             >
-                              Enviar
+                              Submit
                             </Button>
                           </>
                         )}
@@ -161,7 +161,7 @@ export function MyReimbursements() {
                             leftIcon={<Icon as={XCircle} boxSize={4} />}
                             onClick={() => askCancel(r.id)}
                           >
-                            Cancelar
+                            Cancel
                           </Button>
                         )}
                         <Button size="sm" variant="ghost" colorScheme="brand" onClick={() => navigate(`/reimbursements/${r.id}`)}>

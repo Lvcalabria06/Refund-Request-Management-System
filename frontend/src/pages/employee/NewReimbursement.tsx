@@ -114,7 +114,7 @@ export function NewReimbursement() {
         <Button variant="ghost" mr={4} onClick={() => navigate('/reimbursements')} px={2}>
           <Icon as={ArrowLeft} boxSize={5} />
         </Button>
-        <Heading size="lg" color="gray.800">{isEditMode ? 'Editar Rascunho' : 'Nova Solicitação de Reembolso'}</Heading>
+        <Heading size="lg" color="gray.800">{isEditMode ? 'Edit Draft' : 'New Reimbursement Request'}</Heading>
       </Flex>
 
       <Box bg="white" p={8} borderRadius="xl" boxShadow="sm" border="1px solid" borderColor="gray.100">
@@ -122,28 +122,28 @@ export function NewReimbursement() {
           <VStack spacing={5} align="stretch">
             
             <FormControl isInvalid={!!errors.description}>
-              <FormLabel color="gray.700" fontWeight="medium">Descrição da Despesa</FormLabel>
-              <Input placeholder="Ex: Almoço com cliente corporativo" {...register('description')} focusBorderColor="brand.500" />
+              <FormLabel color="gray.700" fontWeight="medium">Expense Description</FormLabel>
+              <Input placeholder="Ex: Business lunch with client" {...register('description')} focusBorderColor="brand.500" />
               <FormErrorMessage>{errors.description?.message}</FormErrorMessage>
             </FormControl>
 
             <Flex gap={5} direction={{ base: 'column', md: 'row' }}>
               <FormControl isInvalid={!!errors.amount} flex={1}>
-                <FormLabel color="gray.700" fontWeight="medium">Valor (R$)</FormLabel>
+                <FormLabel color="gray.700" fontWeight="medium">Amount (R$)</FormLabel>
                 <Input type="number" step="0.01" placeholder="150.00" {...register('amount', { valueAsNumber: true })} focusBorderColor="brand.500" />
                 <FormErrorMessage>{errors.amount?.message}</FormErrorMessage>
               </FormControl>
 
               <FormControl isInvalid={!!errors.expenseDate} flex={1}>
-                <FormLabel color="gray.700" fontWeight="medium">Data da Despesa</FormLabel>
+                <FormLabel color="gray.700" fontWeight="medium">Expense Date</FormLabel>
                 <Input type="date" {...register('expenseDate')} focusBorderColor="brand.500" />
                 <FormErrorMessage>{errors.expenseDate?.message}</FormErrorMessage>
               </FormControl>
             </Flex>
 
             <FormControl isInvalid={!!errors.categoryId}>
-              <FormLabel color="gray.700" fontWeight="medium">Categoria</FormLabel>
-              <Select placeholder="Selecione uma categoria" {...register('categoryId')} focusBorderColor="brand.500">
+              <FormLabel color="gray.700" fontWeight="medium">Category</FormLabel>
+              <Select placeholder="Select a category" {...register('categoryId')} focusBorderColor="brand.500">
                 {categories.map(c => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
@@ -153,10 +153,10 @@ export function NewReimbursement() {
 
             <Flex justify="flex-end" pt={4}>
               <Button colorScheme="gray" mr={3} onClick={() => navigate('/reimbursements')} variant="outline">
-                Cancelar
+                Cancel
               </Button>
               <Button type="submit" colorScheme="brand" isLoading={loading} leftIcon={<Icon as={Save} boxSize={4}/>}>
-                {isEditMode ? 'Atualizar Rascunho' : 'Salvar Rascunho'}
+                {isEditMode ? 'Update Draft' : 'Save Draft'}
               </Button>
             </Flex>
 

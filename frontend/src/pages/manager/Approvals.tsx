@@ -79,24 +79,24 @@ export function Approvals() {
   return (
     <Box>
       <Flex justify="space-between" align="center" mb={6}>
-        <Heading size="lg" color="gray.800">Aprovações Pendentes</Heading>
+        <Heading size="lg" color="gray.800">Pending Approvals</Heading>
       </Flex>
 
       <Box bg="white" borderRadius="xl" boxShadow="sm" border="1px solid" borderColor="gray.100" overflow="hidden">
         {loading ? (
           <Flex justify="center" p={10}><Spinner color="brand.500" size="xl" /></Flex>
         ) : reimbursements.length === 0 ? (
-          <Flex justify="center" p={10}><Text color="gray.500">Não há solicitações aguardando aprovação.</Text></Flex>
+          <Flex justify="center" p={10}><Text color="gray.500">No requests awaiting approval.</Text></Flex>
         ) : (
           <Box overflowX="auto">
             <Table variant="simple">
               <Thead bg="gray.50">
                 <Tr>
-                  <Th>Funcionário</Th>
-                  <Th>Descrição</Th>
-                  <Th>Data da Despesa</Th>
-                  <Th isNumeric>Valor (R$)</Th>
-                  <Th>Ações</Th>
+                  <Th>Employee</Th>
+                  <Th>Description</Th>
+                  <Th>Expense Date</Th>
+                  <Th isNumeric>Amount (R$)</Th>
+                  <Th>Actions</Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -111,8 +111,8 @@ export function Approvals() {
                         <Button size="sm" variant="ghost" colorScheme="brand" onClick={() => navigate(`/reimbursements/${r.id}`)}>
                           <Icon as={Eye} boxSize={4} />
                         </Button>
-                        <Button size="sm" colorScheme="green" onClick={() => handleApprove(r.id)} leftIcon={<Icon as={Check} boxSize={4}/>}>Aprovar</Button>
-                        <Button size="sm" colorScheme="red" variant="outline" onClick={() => handleRejectClick(r.id)} leftIcon={<Icon as={X} boxSize={4}/>}>Rejeitar</Button>
+                        <Button size="sm" colorScheme="green" onClick={() => handleApprove(r.id)} leftIcon={<Icon as={Check} boxSize={4}/>}>Approve</Button>
+                        <Button size="sm" colorScheme="red" variant="outline" onClick={() => handleRejectClick(r.id)} leftIcon={<Icon as={X} boxSize={4}/>}>Reject</Button>
                       </Flex>
                     </Td>
                   </Tr>

@@ -170,13 +170,13 @@ export function Users() {
   return (
     <Box>
       <Flex justify="space-between" align="center" mb={6}>
-        <Heading size="lg" color="gray.800">Usuários do Sistema</Heading>
+        <Heading size="lg" color="gray.800">System Users</Heading>
         <Button
           colorScheme="brand"
           leftIcon={<Icon as={UserPlus} />}
           onClick={() => navigate('/admin/users/new')}
         >
-          Novo Usuário
+           New user
         </Button>
       </Flex>
 
@@ -184,16 +184,16 @@ export function Users() {
         {loading ? (
           <Flex justify="center" p={10}><Spinner color="brand.500" size="xl" /></Flex>
         ) : users.length === 0 ? (
-          <Flex justify="center" p={10}><Text color="gray.500">Nenhum usuário encontrado.</Text></Flex>
+          <Flex justify="center" p={10}><Text color="gray.500">No users found.</Text></Flex>
         ) : (
           <Box overflowX="auto">
             <Table variant="simple">
               <Thead bg="gray.50">
                 <Tr>
-                  <Th>Nome</Th>
+                  <Th>Name</Th>
                   <Th>E-mail</Th>
-                  <Th>Cargo</Th>
-                  <Th>Ações</Th>
+                  <Th>role</Th>
+                  <Th>Action</Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -217,7 +217,7 @@ export function Users() {
                             leftIcon={<Icon as={Edit2} boxSize={4} />}
                             onClick={() => openEdit(u)}
                           >
-                            Editar
+                            Edit
                           </Button>
                           <Button
                             size="sm"
@@ -228,7 +228,7 @@ export function Users() {
                             isDisabled={isSelf}
                             title={isSelf ? 'You cannot delete your own account' : ''}
                           >
-                            Deletar
+                            Delete
                           </Button>
                         </Flex>
                       </Td>
@@ -246,11 +246,11 @@ export function Users() {
         <ModalOverlay />
         <ModalContent>
           <form onSubmit={handleSubmit(onSubmitEdit)}>
-            <ModalHeader>Editar Usuário</ModalHeader>
+            <ModalHeader>Edit User</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <FormControl isInvalid={!!errors.name} mb={3}>
-                <FormLabel>Nome</FormLabel>
+                <FormLabel>Name</FormLabel>
                 <Input {...register('name')} focusBorderColor="brand.500" />
                 <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
               </FormControl>
@@ -262,7 +262,7 @@ export function Users() {
               </FormControl>
 
               <FormControl isInvalid={!!errors.role} mb={3}>
-                <FormLabel>Cargo</FormLabel>
+                <FormLabel>role</FormLabel>
                 <Select
                   {...register('role')}
                   focusBorderColor="brand.500"

@@ -95,9 +95,9 @@ export function Categories() {
   return (
     <Box>
       <Flex justify="space-between" align="center" mb={6}>
-        <Heading size="lg" color="gray.800">Categorias de Reembolso</Heading>
+        <Heading size="lg" color="gray.800">Refund Categories</Heading>
         <Button colorScheme="brand" leftIcon={<Icon as={Plus} boxSize={4}/>} onClick={openCreateModal}>
-          Nova Categoria
+          New Category
         </Button>
       </Flex>
 
@@ -105,15 +105,15 @@ export function Categories() {
         {loading ? (
           <Flex justify="center" p={10}><Spinner color="brand.500" size="xl" /></Flex>
         ) : categories.length === 0 ? (
-          <Flex justify="center" p={10}><Text color="gray.500">Nenhuma categoria encontrada.</Text></Flex>
+          <Flex justify="center" p={10}><Text color="gray.500">No categories found.</Text></Flex>
         ) : (
           <Box overflowX="auto">
             <Table variant="simple">
               <Thead bg="gray.50">
                 <Tr>
-                  <Th>Nome da Categoria</Th>
+                  <Th>Category Name</Th>
                   <Th>Status</Th>
-                  <Th>Ações</Th>
+                  <Th>Actions</Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -122,7 +122,7 @@ export function Categories() {
                     <Td fontWeight="bold" color="gray.700">{cat.name}</Td>
                     <Td>
                       <Badge colorScheme={cat.isActive ? 'green' : 'red'} px={2} py={1} borderRadius="md">
-                        {cat.isActive ? 'ATIVA' : 'INATIVA'}
+                        {cat.isActive ? 'ACTIVE' : 'INACTIVE'}
                       </Badge>
                     </Td>
                     <Td>
@@ -134,7 +134,7 @@ export function Categories() {
                           leftIcon={<Icon as={Edit2} boxSize={4}/>}
                           onClick={() => openEditModal(cat)}
                         >
-                          Editar
+                          Edit
                         </Button>
                         <Button 
                           size="sm" 
@@ -143,7 +143,7 @@ export function Categories() {
                           leftIcon={<Icon as={cat.isActive ? PowerOff : Power} boxSize={4}/>}
                           onClick={() => toggleCategory(cat.id, cat.isActive, cat.name)}
                         >
-                          {cat.isActive ? 'Desativar' : 'Ativar'}
+                          {cat.isActive ? 'Disable' : 'Activate'}
                         </Button>
                       </Flex>
                     </Td>
@@ -160,13 +160,13 @@ export function Categories() {
         <ModalOverlay />
         <ModalContent>
           <form onSubmit={handleSubmit(onSubmitForm)}>
-            <ModalHeader>{editingCategory ? 'Editar Categoria' : 'Nova Categoria'}</ModalHeader>
+            <ModalHeader>{editingCategory ? 'Edit Category' : 'New Category'}</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <FormControl isInvalid={!!errors.name}>
-                <FormLabel>Nome da Categoria</FormLabel>
+                <FormLabel>Category Name</FormLabel>
                 <Input 
-                  placeholder="Ex: Viagem, Hospedagem..." 
+                  placeholder="Ex: Travel, Accommodation..." 
                   focusBorderColor="brand.500" 
                   {...register('name')} 
                 />
@@ -174,9 +174,9 @@ export function Categories() {
               </FormControl>
             </ModalBody>
             <ModalFooter>
-              <Button variant="ghost" mr={3} onClick={onClose}>Cancelar</Button>
+              <Button variant="ghost" mr={3} onClick={onClose}>Cancel</Button>
               <Button colorScheme="brand" type="submit" isLoading={isSubmitting}>
-                {editingCategory ? 'Salvar Alterações' : 'Criar Categoria'}
+                {editingCategory ? 'Save Changes' : 'Create Category'}
               </Button>
             </ModalFooter>
           </form>

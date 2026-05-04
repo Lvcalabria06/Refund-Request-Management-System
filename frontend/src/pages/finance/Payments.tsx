@@ -54,24 +54,24 @@ export function Payments() {
   return (
     <Box>
       <Flex justify="space-between" align="center" mb={6}>
-        <Heading size="lg" color="gray.800">Pagamentos Pendentes</Heading>
+        <Heading size="lg" color="gray.800">Pending Payments</Heading>
       </Flex>
 
       <Box bg="white" borderRadius="xl" boxShadow="sm" border="1px solid" borderColor="gray.100" overflow="hidden">
         {loading ? (
           <Flex justify="center" p={10}><Spinner color="brand.500" size="xl" /></Flex>
         ) : reimbursements.length === 0 ? (
-          <Flex justify="center" p={10}><Text color="gray.500">Nenhum pagamento pendente no momento.</Text></Flex>
+          <Flex justify="center" p={10}><Text color="gray.500">No pending payments at this time.</Text></Flex>
         ) : (
           <Box overflowX="auto">
             <Table variant="simple">
               <Thead bg="gray.50">
                 <Tr>
-                  <Th>Funcionário</Th>
-                  <Th>Descrição</Th>
-                  <Th>Data da Despesa</Th>
-                  <Th isNumeric>Valor (R$)</Th>
-                  <Th>Ação</Th>
+                  <Th>Employee</Th>
+                  <Th>Description</Th>
+                  <Th>Expense Date</Th>
+                  <Th isNumeric>Amount (R$)</Th>
+                  <Th>Action</Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -87,7 +87,7 @@ export function Payments() {
                           <Icon as={Eye} boxSize={4} />
                         </Button>
                         <Button size="sm" colorScheme="purple" onClick={() => handlePay(r.id)} leftIcon={<Icon as={DollarSign} boxSize={4}/>}>
-                          Marcar como Pago
+                          Mark as Paid
                         </Button>
                       </Flex>
                     </Td>

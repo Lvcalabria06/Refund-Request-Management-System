@@ -81,7 +81,7 @@ export function NewUser() {
           <Icon as={ArrowLeft} boxSize={5} />
         </Button>
         <Heading size="lg" color="gray.800">
-          Novo Usuário
+          New user
         </Heading>
       </Flex>
 
@@ -97,7 +97,7 @@ export function NewUser() {
           <VStack spacing={5} align="stretch">
             <FormControl isInvalid={!!errors.name}>
               <FormLabel color="gray.700" fontWeight="medium">
-                Nome completo
+                Completed name
               </FormLabel>
               <Input
                 placeholder="Ex: João da Silva"
@@ -123,7 +123,7 @@ export function NewUser() {
             <Flex gap={5} direction={{ base: 'column', md: 'row' }}>
               <FormControl isInvalid={!!errors.password} flex={1}>
                 <FormLabel color="gray.700" fontWeight="medium">
-                  Senha provisória
+                  Temporary password
                 </FormLabel>
                 <Input
                   type="password"
@@ -136,7 +136,7 @@ export function NewUser() {
 
               <FormControl isInvalid={!!errors.role} flex={1}>
                 <FormLabel color="gray.700" fontWeight="medium">
-                  Cargo
+                  role
                 </FormLabel>
                 <Select
                   placeholder="Selecione um cargo"
@@ -159,7 +159,7 @@ export function NewUser() {
                 onClick={() => navigate('/admin/users')}
                 variant="outline"
               >
-                Cancelar
+                Cancel
               </Button>
               <Button
                 type="submit"
@@ -167,7 +167,7 @@ export function NewUser() {
                 isLoading={loading}
                 leftIcon={<Icon as={UserPlus} />}
               >
-                Cadastrar Usuário
+                Register User
               </Button>
             </Flex>
           </VStack>

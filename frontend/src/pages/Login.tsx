@@ -92,16 +92,16 @@ export function Login() {
             <Heading fontSize="3xl" color="gray.800" fontWeight="extrabold">
               Pitang Refunds
             </Heading>
-            <Text color="gray.500">Faça login para gerenciar suas solicitações.</Text>
+            <Text color="gray.500">Sign in to manage your reimbursement requests.</Text>
           </VStack>
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <VStack spacing={4}>
               <FormControl isInvalid={!!errors.email}>
-                <FormLabel color="gray.700" fontWeight="medium">E-mail</FormLabel>
+                <FormLabel color="gray.700" fontWeight="medium">Email</FormLabel>
                 <Input
                   type="email"
-                  placeholder="exemplo@pitang.com"
+                  placeholder="example@pitang.com"
                   size="lg"
                   focusBorderColor="brand.500"
                   borderRadius="lg"
@@ -113,7 +113,7 @@ export function Login() {
               </FormControl>
 
               <FormControl isInvalid={!!errors.password}>
-                <FormLabel color="gray.700" fontWeight="medium">Senha</FormLabel>
+                <FormLabel color="gray.700" fontWeight="medium">Password</FormLabel>
                 <Input
                   type="password"
                   placeholder="••••••••"
@@ -134,25 +134,25 @@ export function Login() {
                 w="full"
                 mt={4}
                 isLoading={isLoading}
-                loadingText="Entrando..."
+                loadingText="Signing in..."
                 leftIcon={<Icon as={LogIn} />}
                 borderRadius="lg"
                 boxShadow="md"
                 _hover={{ transform: 'translateY(-2px)', boxShadow: 'lg' }}
                 transition="all 0.2s"
               >
-                Entrar
+                Sign In
               </Button>
             </VStack>
           </form>
 
           <Box textAlign="center" pt={4} borderTop="1px solid" borderColor="gray.100">
             <Text fontSize="sm" color="gray.500" fontWeight="medium">
-              Contas de teste padrão:
+              Default test accounts:
             </Text>
             <Text fontSize="xs" color="gray.400" mt={1}>
               emp@test.com | mgr@test.com | fin@test.com<br />
-              Senha: 123456
+              Password: 123456
             </Text>
           </Box>
         </VStack>

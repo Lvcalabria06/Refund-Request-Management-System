@@ -231,7 +231,7 @@ export function ReimbursementDetail() {
           <Icon as={ArrowLeft} boxSize={5} />
         </Button>
         <Heading size="lg" color="gray.800">
-          Detalhes da Solicitação
+          Request Details
         </Heading>
       </Flex>
 
@@ -247,7 +247,7 @@ export function ReimbursementDetail() {
       >
         <Flex justify="space-between" align="flex-start" mb={4}>
           <Box>
-            <Text fontSize="sm" color="gray.500">Descrição</Text>
+            <Text fontSize="sm" color="gray.500">Description</Text>
             <Text fontSize="lg" fontWeight="bold" color="gray.800">
               {reimbursement.description}
             </Text>
@@ -267,26 +267,26 @@ export function ReimbursementDetail() {
 
         <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
           <Box>
-            <Text fontSize="sm" color="gray.500">Valor</Text>
+            <Text fontSize="sm" color="gray.500">Amount</Text>
             <Text fontWeight="bold" color="gray.800">
               R$ {reimbursement.amount.toFixed(2)}
             </Text>
           </Box>
           <Box>
-            <Text fontSize="sm" color="gray.500">Data da Despesa</Text>
+            <Text fontSize="sm" color="gray.500">Expense Date</Text>
             <Text fontWeight="bold" color="gray.800">
               {dayjs(reimbursement.expenseDate).format('DD/MM/YYYY')}
             </Text>
           </Box>
           <Box>
-            <Text fontSize="sm" color="gray.500">Categoria</Text>
+            <Text fontSize="sm" color="gray.500">Category</Text>
             <Text fontWeight="bold" color="gray.800">
               {reimbursement.category?.name}
             </Text>
           </Box>
           {reimbursement.employee && (
             <Box>
-              <Text fontSize="sm" color="gray.500">Funcionário</Text>
+              <Text fontSize="sm" color="gray.500">Employee</Text>
               <Text fontWeight="bold" color="gray.800">
                 {reimbursement.employee.name}
               </Text>
@@ -304,7 +304,7 @@ export function ReimbursementDetail() {
             borderRadius="md"
           >
             <Text fontSize="sm" color="red.700" fontWeight="bold">
-              Motivo da rejeição:
+              Rejection reason:
             </Text>
             <Text fontSize="sm" color="red.600">
               {reimbursement.rejectionReason}
@@ -338,7 +338,7 @@ export function ReimbursementDetail() {
               leftIcon={<Icon as={Plus} boxSize={4} />}
               onClick={() => setShowAttachmentForm(!showAttachmentForm)}
             >
-              {showAttachmentForm ? 'Cancelar' : 'Adicionar'}
+              {showAttachmentForm ? 'Cancel' : 'Add'}
             </Button>
           )}
         </Flex>
@@ -348,7 +348,7 @@ export function ReimbursementDetail() {
             <VStack spacing={3} align="stretch">
               <FormControl>
                 <FormLabel fontSize="sm">
-                  Selecionar arquivo (PDF, JPG ou PNG — máx. 5MB)
+                  Select file (PDF, JPG or PNG — max. 5MB)
                 </FormLabel>
                 <Input
                   type="file"
@@ -390,7 +390,7 @@ export function ReimbursementDetail() {
                 isLoading={submittingAttachment}
                 isDisabled={!selectedFile}
               >
-                Salvar Anexo
+                Save Attachment
               </Button>
             </VStack>
           </Box>
@@ -398,7 +398,7 @@ export function ReimbursementDetail() {
 
         {attachments.length === 0 ? (
           <Text color="gray.500" fontSize="sm">
-            Nenhum anexo cadastrado.
+            No attachments found.
           </Text>
         ) : (
           <VStack spacing={2} align="stretch">
@@ -426,7 +426,7 @@ export function ReimbursementDetail() {
                 <HStack spacing={3}>
                   <ChakraLink href={att.url} isExternal color="brand.500">
                     <HStack spacing={1}>
-                      <Text fontSize="sm">Abrir</Text>
+                      <Text fontSize="sm">Open</Text>
                       <Icon as={ExternalLink} boxSize={3} />
                     </HStack>
                   </ChakraLink>
@@ -436,7 +436,7 @@ export function ReimbursementDetail() {
                       variant="ghost"
                       colorScheme="red"
                       onClick={() => handleDeleteAttachment(att.id)}
-                      aria-label="Remover anexo"
+                      aria-label="Remove attachment"
                     >
                       <Icon as={Trash2} boxSize={4} />
                     </Button>
@@ -460,13 +460,13 @@ export function ReimbursementDetail() {
         <HStack mb={4}>
           <Icon as={Clock} color="brand.500" />
           <Heading size="md" color="gray.800">
-            Histórico
+            History
           </Heading>
         </HStack>
 
         {history.length === 0 ? (
           <Text color="gray.500" fontSize="sm">
-            Nenhum registro de histórico.
+            No history records.
           </Text>
         ) : (
           <VStack spacing={3} align="stretch">
@@ -491,7 +491,7 @@ export function ReimbursementDetail() {
                   {h.notes}
                 </Text>
                 <Text fontSize="xs" color="gray.500" mt={1}>
-                  por <strong>{h.author?.name}</strong>
+                  by <strong>{h.author?.name}</strong>
                 </Text>
               </Box>
             ))}
