@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { ReimbursementService } from '../services/ReimbursementService';
 import { createReimbursementSchema, updateReimbursementSchema, rejectReimbursementSchema, createAttachmentSchema } from '../schemas/reimbursementSchema';
+import { idParamSchema } from '../schemas/commonSchema';
 import { ZodError } from 'zod';
 
 const reimbursementService = new ReimbursementService();
@@ -15,12 +16,12 @@ function handleError(res: Response, error: any) {
   if (message.includes('not found')) {
     return res.status(404).json({ error: message });
   }
-  
+
   if (
-    message.includes('Only EMPLOYEE') || 
-    message.includes('Only MANAGER') || 
-    message.includes('Only FINANCE') || 
-    message.includes('owner') || 
+    message.includes('Only EMPLOYEE') ||
+    message.includes('Only MANAGER') ||
+    message.includes('Only FINANCE') ||
+    message.includes('owner') ||
     message.includes('Unauthorized')
   ) {
     return res.status(403).json({ error: message });
@@ -56,9 +57,9 @@ export class ReimbursementController {
   async update(req: Request, res: Response) {
     try {
       const user = req.user!;
-      const { id } = req.params;
+      const { id } = idParamSchema.parse(req.params);
       const validatedData = updateReimbursementSchema.parse(req.body);
-      const reimbursement = await reimbursementService.update(String(id), validatedData, user);
+      const reimbursement = await reimbursementService.update(id, validatedData, user);
       res.status(200).json(reimbursement);
     } catch (error: any) {
       handleError(res, error);
@@ -78,8 +79,8 @@ export class ReimbursementController {
   async getById(req: Request, res: Response) {
     try {
       const user = req.user!;
-      const { id } = req.params;
-      const reimbursement = await reimbursementService.findById(String(id), user);
+      const { id } = idParamSchema.parse(req.params);
+      const reimbursement = await reimbursementService.findById(id, user);
       res.status(200).json(reimbursement);
     } catch (error: any) {
       handleError(res, error);
@@ -89,8 +90,8 @@ export class ReimbursementController {
   async submit(req: Request, res: Response) {
     try {
       const user = req.user!;
-      const { id } = req.params;
-      const reimbursement = await reimbursementService.submit(String(id), user);
+      const { id } = idParamSchema.parse(req.params);
+      const reimbursement = await reimbursementService.submit(id, user);
       res.status(200).json(reimbursement);
     } catch (error: any) {
       handleError(res, error);
@@ -100,8 +101,8 @@ export class ReimbursementController {
   async approve(req: Request, res: Response) {
     try {
       const user = req.user!;
-      const { id } = req.params;
-      const reimbursement = await reimbursementService.approve(String(id), user);
+      const { id } = idParamSchema.parse(req.params);
+      const reimbursement = await reimbursementService.approve(id, user);
       res.status(200).json(reimbursement);
     } catch (error: any) {
       handleError(res, error);
@@ -111,9 +112,9 @@ export class ReimbursementController {
   async reject(req: Request, res: Response) {
     try {
       const user = req.user!;
-      const { id } = req.params;
+      const { id } = idParamSchema.parse(req.params);
       const { reason } = rejectReimbursementSchema.parse(req.body);
-      const reimbursement = await reimbursementService.reject(String(id), reason, user);
+      const reimbursement = await reimbursementService.reject(id, reason, user);
       res.status(200).json(reimbursement);
     } catch (error: any) {
       handleError(res, error);
@@ -123,8 +124,8 @@ export class ReimbursementController {
   async pay(req: Request, res: Response) {
     try {
       const user = req.user!;
-      const { id } = req.params;
-      const reimbursement = await reimbursementService.pay(String(id), user);
+      const { id } = idParamSchema.parse(req.params);
+      const reimbursement = await reimbursementService.pay(id, user);
       res.status(200).json(reimbursement);
     } catch (error: any) {
       handleError(res, error);
@@ -134,8 +135,8 @@ export class ReimbursementController {
   async cancel(req: Request, res: Response) {
     try {
       const user = req.user!;
-      const { id } = req.params;
-      const reimbursement = await reimbursementService.cancel(String(id), user);
+      const { id } = idParamSchema.parse(req.params);
+      const reimbursement = await reimbursementService.cancel(id, user);
       res.status(200).json(reimbursement);
     } catch (error: any) {
       handleError(res, error);
@@ -145,9 +146,9 @@ export class ReimbursementController {
   async addAttachment(req: Request, res: Response) {
     try {
       const user = req.user!;
-      const { id } = req.params;
+      const { id } = idParamSchema.parse(req.params);
       const validatedData = createAttachmentSchema.parse(req.body);
-      const attachment = await reimbursementService.addAttachment(String(id), validatedData, user);
+      const attachment = await reimbursementService.addAttachment(id, validatedData, user);
       res.status(201).json(attachment);
     } catch (error: any) {
       handleError(res, error);
@@ -157,8 +158,8 @@ export class ReimbursementController {
   async getAttachments(req: Request, res: Response) {
     try {
       const user = req.user!;
-      const { id } = req.params;
-      const attachments = await reimbursementService.getAttachments(String(id), user);
+      const { id } = idParamSchema.parse(req.params);
+      const attachments = await reimbursementService.getAttachments(id, user);
       res.status(200).json(attachments);
     } catch (error: any) {
       handleError(res, error);
@@ -168,8 +169,8 @@ export class ReimbursementController {
   async getHistory(req: Request, res: Response) {
     try {
       const user = req.user!;
-      const { id } = req.params;
-      const history = await reimbursementService.getHistory(String(id), user);
+      const { id } = idParamSchema.parse(req.params);
+      const history = await reimbursementService.getHistory(id, user);
       res.status(200).json(history);
     } catch (error: any) {
       handleError(res, error);
