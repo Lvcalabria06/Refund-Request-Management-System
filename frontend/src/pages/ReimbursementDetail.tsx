@@ -16,7 +16,6 @@ import {
   FormControl,
   FormLabel,
   Input,
-  Select,
   useToast,
   Link as ChakraLink,
 } from '@chakra-ui/react';
@@ -71,12 +70,60 @@ export function ReimbursementDetail() {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Estado do formulário de novo anexo
+  // Estado do formulário de novo anexo (upload simulado via base64)
   const [showAttachmentForm, setShowAttachmentForm] = useState(false);
-  const [fileName, setFileName] = useState('');
-  const [fileUrl, setFileUrl] = useState('');
-  const [fileType, setFileType] = useState('PDF');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [detectedFileType, setDetectedFileType] = useState<'PDF' | 'JPG' | 'PNG' | null>(null);
   const [submittingAttachment, setSubmittingAttachment] = useState(false);
+
+  // Detecta o tipo a partir da extensão do arquivo
+  const detectFileType = (file: File): 'PDF' | 'JPG' | 'PNG' | null => {
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    if (ext === 'pdf') return 'PDF';
+    if (ext === 'jpg' || ext === 'jpeg') return 'JPG';
+    if (ext === 'png') return 'PNG';
+    return null;
+  };
+
+  // Converte o arquivo em data URL base64 (upload simulado)
+  const fileToDataUrl = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const type = detectFileType(file);
+    if (!type) {
+      toast({
+        title: 'Tipo de arquivo não permitido',
+        description: 'Aceitos apenas: PDF, JPG ou PNG.',
+        status: 'warning',
+      });
+      e.target.value = '';
+      return;
+    }
+
+    // Limite de 5MB para evitar payloads gigantes em base64
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: 'Arquivo muito grande',
+        description: 'O limite é 5MB.',
+        status: 'warning',
+      });
+      e.target.value = '';
+      return;
+    }
+
+    setSelectedFile(file);
+    setDetectedFileType(type);
+  };
 
   const loadAll = async () => {
     if (!id) return;
@@ -108,22 +155,25 @@ export function ReimbursementDetail() {
   }, [id]);
 
   const handleAddAttachment = async () => {
-    if (!fileName.trim() || !fileUrl.trim()) {
-      toast({ title: 'Preencha nome e URL do arquivo.', status: 'warning' });
+    if (!selectedFile || !detectedFileType) {
+      toast({ title: 'Selecione um arquivo.', status: 'warning' });
       return;
     }
     try {
       setSubmittingAttachment(true);
+      const dataUrl = await fileToDataUrl(selectedFile);
+
       await api.post(`/reimbursements/${id}/attachments`, {
-        fileName,
-        url: fileUrl,
-        fileType,
+        fileName: selectedFile.name,
+        url: dataUrl,
+        fileType: detectedFileType,
       });
+
       toast({ title: 'Anexo adicionado com sucesso!', status: 'success' });
-      setFileName('');
-      setFileUrl('');
-      setFileType('PDF');
+      setSelectedFile(null);
+      setDetectedFileType(null);
       setShowAttachmentForm(false);
+
       const attRes = await api.get(`/reimbursements/${id}/attachments`);
       setAttachments(attRes.data);
     } catch (err) {
@@ -280,40 +330,48 @@ export function ReimbursementDetail() {
           <Box bg="gray.50" p={4} borderRadius="md" mb={4}>
             <VStack spacing={3} align="stretch">
               <FormControl>
-                <FormLabel fontSize="sm">Nome do arquivo</FormLabel>
+                <FormLabel fontSize="sm">
+                  Selecionar arquivo (PDF, JPG ou PNG — máx. 5MB)
+                </FormLabel>
                 <Input
-                  size="sm"
-                  placeholder="nota_fiscal.pdf"
-                  value={fileName}
-                  onChange={(e) => setFileName(e.target.value)}
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                  onChange={handleFileChange}
+                  p={1}
+                  border="1px solid"
+                  borderColor="gray.300"
+                  bg="white"
                 />
               </FormControl>
-              <FormControl>
-                <FormLabel fontSize="sm">URL</FormLabel>
-                <Input
-                  size="sm"
-                  placeholder="https://exemplo.com/arquivo.pdf"
-                  value={fileUrl}
-                  onChange={(e) => setFileUrl(e.target.value)}
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel fontSize="sm">Tipo</FormLabel>
-                <Select
-                  size="sm"
-                  value={fileType}
-                  onChange={(e) => setFileType(e.target.value)}
+
+              {selectedFile && detectedFileType && (
+                <Flex
+                  p={3}
+                  bg="white"
+                  borderRadius="md"
+                  align="center"
+                  border="1px solid"
+                  borderColor="gray.200"
                 >
-                  <option value="PDF">PDF</option>
-                  <option value="JPG">JPG</option>
-                  <option value="PNG">PNG</option>
-                </Select>
-              </FormControl>
+                  <Icon as={Paperclip} color="gray.500" boxSize={4} mr={2} />
+                  <Text fontSize="sm" color="gray.700" fontWeight="medium" mr={2}>
+                    {selectedFile.name}
+                  </Text>
+                  <Badge colorScheme="blue" mr={2}>
+                    {detectedFileType}
+                  </Badge>
+                  <Text fontSize="xs" color="gray.500">
+                    {(selectedFile.size / 1024).toFixed(1)} KB
+                  </Text>
+                </Flex>
+              )}
+
               <Button
                 size="sm"
                 colorScheme="brand"
                 onClick={handleAddAttachment}
                 isLoading={submittingAttachment}
+                isDisabled={!selectedFile}
               >
                 Salvar Anexo
               </Button>
