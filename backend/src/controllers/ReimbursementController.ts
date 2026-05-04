@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ReimbursementService } from '../services/ReimbursementService';
-import { createReimbursementSchema, updateReimbursementSchema, rejectReimbursementSchema, createAttachmentSchema } from '../schemas/reimbursementSchema';
-import { idParamSchema } from '../schemas/commonSchema';
+import { createReimbursementSchema, updateReimbursementSchema, rejectReimbursementSchema, createAttachmentSchema, updateAttachmentSchema } from '../schemas/reimbursementSchema';
+import { idParamSchema, reimbursementAttachmentParamsSchema, reimbursementQuerySchema } from '../schemas/commonSchema';
 import { ZodError } from 'zod';
 
 const reimbursementService = new ReimbursementService();
@@ -31,7 +31,8 @@ function handleError(res: Response, error: any) {
   'Only DRAFT', 'Only SUBMITTED', 'Only APPROVED',
   'Category is invalid', 'Expense date cannot',
   'Attachments can only', 'reimbursements can be',
-  ];
+  'require at least one attachment',
+];
   const isKnownBusinessError = businessRuleErrors.some(p => message.includes(p));
 
   if (isKnownBusinessError) {
@@ -161,6 +162,40 @@ export class ReimbursementController {
       const { id } = idParamSchema.parse(req.params);
       const attachments = await reimbursementService.getAttachments(id, user);
       res.status(200).json(attachments);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  }
+
+  async getAttachmentById(req: Request, res: Response) {
+    try {
+      const user = req.user!;
+      const { id, attachmentId } = reimbursementAttachmentParamsSchema.parse(req.params);
+      const attachment = await reimbursementService.getAttachmentById(id, attachmentId, user);
+      res.status(200).json(attachment);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  }
+
+  async updateAttachment(req: Request, res: Response) {
+    try {
+      const user = req.user!;
+      const { id, attachmentId } = reimbursementAttachmentParamsSchema.parse(req.params);
+      const data = updateAttachmentSchema.parse(req.body);
+      const attachment = await reimbursementService.updateAttachment(id, attachmentId, data, user);
+      res.status(200).json(attachment);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  }
+
+  async deleteAttachment(req: Request, res: Response) {
+    try {
+      const user = req.user!;
+      const { id, attachmentId } = reimbursementAttachmentParamsSchema.parse(req.params);
+      await reimbursementService.deleteAttachment(id, attachmentId, user);
+      res.status(204).send();
     } catch (error: any) {
       handleError(res, error);
     }

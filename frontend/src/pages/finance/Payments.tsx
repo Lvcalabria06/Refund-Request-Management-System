@@ -43,11 +43,11 @@ export function Payments() {
   const handlePay = async (id: string) => {
     try {
       await api.post(`/reimbursements/${id}/pay`);
-      toast({ title: 'Pagamento Confirmado', status: 'success' });
+      toast({ title: 'Payment confirmed', status: 'success' });
       loadReimbursements();
     } catch (err) {
       const error = err as any;
-      toast({ title: 'Erro', description: error.response?.data?.error || 'Erro ao pagar', status: 'error' });
+      toast({ title: 'Error', description: error.response?.data?.error || 'Failed to pay', status: 'error' });
     }
   };
 

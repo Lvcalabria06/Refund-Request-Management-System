@@ -49,11 +49,11 @@ export function Approvals() {
   const handleApprove = async (id: string) => {
     try {
       await api.post(`/reimbursements/${id}/approve`);
-      toast({ title: 'Reembolso Aprovado', status: 'success' });
+      toast({ title: 'Reimbursement approved', status: 'success' });
       loadReimbursements();
     } catch (err) {
       const error = err as any;
-      toast({ title: 'Erro', description: error.response?.data?.error || 'Erro ao aprovar', status: 'error' });
+      toast({ title: 'Error', description: error.response?.data?.error || 'Failed to approve', status: 'error' });
     }
   };
 
@@ -67,12 +67,12 @@ export function Approvals() {
     if (!rejectId || !rejectReason.trim()) return;
     try {
       await api.post(`/reimbursements/${rejectId}/reject`, { reason: rejectReason });
-      toast({ title: 'Reembolso Rejeitado', status: 'success' });
+      toast({ title: 'Reimbursement rejected', status: 'success' });
       onClose();
       loadReimbursements();
     } catch (err) {
       const error = err as any;
-      toast({ title: 'Erro', description: error.response?.data?.error || 'Erro ao rejeitar', status: 'error' });
+      toast({ title: 'Error', description: error.response?.data?.error || 'Failed to reject', status: 'error' });
     }
   };
 
@@ -123,24 +123,24 @@ export function Approvals() {
         )}
       </Box>
 
-      {/* Modal de Rejeição */}
+      {/* Rejection Modal */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Motivo da Rejeição</ModalHeader>
+          <ModalHeader>Rejection reason</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Textarea 
-              placeholder="Por favor, explique o motivo da rejeição (mínimo 5 caracteres)" 
-              value={rejectReason} 
-              onChange={(e) => setRejectReason(e.target.value)} 
+            <Textarea
+              placeholder="Please explain the reason for rejection (minimum 5 characters)"
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
               focusBorderColor="red.500"
               rows={4}
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="ghost" mr={3} onClick={onClose}>Cancelar</Button>
-            <Button colorScheme="red" onClick={confirmReject} isDisabled={rejectReason.length < 5}>Confirmar Rejeição</Button>
+            <Button variant="ghost" mr={3} onClick={onClose}>Cancel</Button>
+            <Button colorScheme="red" onClick={confirmReject} isDisabled={rejectReason.length < 5}>Confirm rejection</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

@@ -44,7 +44,7 @@ describe('Login', () => {
     const form = screen.getByLabelText(/e-mail/i).closest('form')!;
     fireEvent.submit(form);
 
-    expect(await screen.findByText(/e-mail inválido/i)).toBeInTheDocument();
+    expect(await screen.findByText(/invalid email/i)).toBeInTheDocument();
     expect(mockPost).not.toHaveBeenCalled();
   });
 
@@ -57,7 +57,7 @@ describe('Login', () => {
     await user.click(screen.getByRole('button', { name: /entrar/i }));
 
     expect(
-      await screen.findByText(/senha deve ter no mínimo 6 caracteres/i)
+      await screen.findByText(/password must be at least 6 characters/i)
     ).toBeInTheDocument();
     expect(mockPost).not.toHaveBeenCalled();
   });

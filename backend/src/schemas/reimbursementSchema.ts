@@ -13,8 +13,6 @@ export const rejectReimbursementSchema = z.object({
 
 export const createAttachmentSchema = z.object({
   fileName: z.string().min(1, 'File name is required'),
-  // Aceita tanto URL externa (http/https) quanto data URL base64
-  // (usada pelo frontend para "upload simulado" do arquivo)
   url: z
     .string()
     .min(1, 'URL is required')
@@ -32,4 +30,8 @@ export const updateReimbursementSchema = z.object({
   amount: z.number().positive('Amount must be greater than zero').optional(),
   expenseDate: z.string().datetime({ message: 'Invalid expense date' }).optional(),
   categoryId: z.string().uuid('Invalid category ID').optional(),
+});
+
+export const updateAttachmentSchema = z.object({
+  fileName: z.string().min(1, 'File name is required'),
 });

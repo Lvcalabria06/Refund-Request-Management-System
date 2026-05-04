@@ -1,6 +1,6 @@
 import { prisma } from '../lib/prisma';
 import { z } from 'zod';
-import { createReimbursementSchema, createAttachmentSchema } from '../schemas/reimbursementSchema';
+import { createReimbursementSchema, createAttachmentSchema, updateAttachmentSchema } from '../schemas/reimbursementSchema';
 import dayjs from 'dayjs';
 
 export class ReimbursementService {
@@ -179,6 +179,16 @@ export class ReimbursementService {
     if (reimbursement.status !== 'DRAFT') {
       throw new Error('Only DRAFT reimbursements can be submitted');
     }
+    
+    // EXTRA: Bloqueio de solicitação sem anexo acima de determinado valor.
+    const ATTACHMENT_REQUIRED_THRESHOLD = 500;
+    if (reimbursement.amount > ATTACHMENT_REQUIRED_THRESHOLD) {
+      if (!reimbursement.attachments || reimbursement.attachments.length === 0) {
+        throw new Error(
+          `Reimbursements above R$ ${ATTACHMENT_REQUIRED_THRESHOLD} require at least one attachment`
+        );
+      }
+    }
 
     return prisma.$transaction(async (tx) => {
       const updated = await tx.reimbursement.update({
@@ -311,12 +321,89 @@ export class ReimbursementService {
   }
 
   async getAttachments(id: string, user: { id: string; role: string }) {
-    await this.findById(id, user); // validates access
+    await this.findById(id, user); 
 
     return prisma.attachment.findMany({
       where: { reimbursementId: id },
       orderBy: { createdAt: 'asc' },
     });
+  }
+
+  async getAttachmentById(
+    reimbursementId: string,
+    attachmentId: string,
+    user: { id: string; role: string }
+  ) {
+  
+    await this.findById(reimbursementId, user);
+
+    const attachment = await prisma.attachment.findUnique({
+      where: { id: attachmentId },
+    });
+
+    
+    if (!attachment || attachment.reimbursementId !== reimbursementId) {
+      throw new Error('Attachment not found');
+    }
+
+    return attachment;
+  }
+
+  async updateAttachment(
+    reimbursementId: string,
+    attachmentId: string,
+    data: z.infer<typeof updateAttachmentSchema>,
+    user: { id: string; role: string }
+  ) {
+    const reimbursement = await this.findById(reimbursementId, user);
+
+    if (reimbursement.employeeId !== user.id) {
+      throw new Error('Only the owner can update attachments');
+    }
+
+    if (reimbursement.status !== 'DRAFT' && reimbursement.status !== 'SUBMITTED') {
+      throw new Error('Attachments can only be updated when reimbursement is DRAFT or SUBMITTED');
+    }
+
+    const attachment = await prisma.attachment.findUnique({
+      where: { id: attachmentId },
+    });
+    if (!attachment || attachment.reimbursementId !== reimbursementId) {
+      throw new Error('Attachment not found');
+    }
+
+    return prisma.attachment.update({
+      where: { id: attachmentId },
+      data: { fileName: data.fileName },
+    });
+  }
+
+  async deleteAttachment(
+    reimbursementId: string,
+    attachmentId: string,
+    user: { id: string; role: string }
+  ) {
+    const reimbursement = await this.findById(reimbursementId, user);
+
+    if (reimbursement.employeeId !== user.id) {
+      throw new Error('Only the owner can delete attachments');
+    }
+
+    if (reimbursement.status !== 'DRAFT' && reimbursement.status !== 'SUBMITTED') {
+      throw new Error('Attachments can only be deleted when reimbursement is DRAFT or SUBMITTED');
+    }
+
+    const attachment = await prisma.attachment.findUnique({
+      where: { id: attachmentId },
+    });
+    if (!attachment || attachment.reimbursementId !== reimbursementId) {
+      throw new Error('Attachment not found');
+    }
+
+    await prisma.attachment.delete({
+      where: { id: attachmentId },
+    });
+    return { success: true };
   }
 
   async getHistory(id: string, user: { id: string; role: string }) {

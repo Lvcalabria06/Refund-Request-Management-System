@@ -44,15 +44,15 @@ export function MyReimbursements() {
     if (!cancelTarget) return;
     try {
       await api.post(`/reimbursements/${cancelTarget}/cancel`);
-      toast({ title: 'Solicitação cancelada', status: 'success', duration: 3000 });
+      toast({ title: 'Reimbursement canceled', status: 'success', duration: 3000 });
       onClose();
       setCancelTarget(null);
       loadReimbursements();
     } catch (err) {
       const error = err as { response?: { data?: { error?: string } } };
       toast({
-        title: 'Erro ao cancelar',
-        description: error.response?.data?.error || 'Tente novamente.',
+        title: 'Failed to cancel',
+        description: error.response?.data?.error || 'Please try again.',
         status: 'error',
       });
     }
@@ -142,8 +142,8 @@ export function MyReimbursements() {
                                 } catch (e) {
                                     const error = e as { response?: { data?: { error?: string } } };
                                     toast({
-                                      title: 'Erro ao enviar',
-                                      description: error.response?.data?.error || 'Tente novamente.',
+                                      title: 'Failed to submit',
+                                      description: error.response?.data?.error || 'Please try again.',
                                       status: 'error',
                                       duration: 3000,});
                                   }
@@ -177,22 +177,22 @@ export function MyReimbursements() {
         )}
       </Box>
 
-      {/* Diálogo de confirmação para cancelar */}
+      {/* Cancel confirmation dialog */}
       <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose}>
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Cancelar solicitação?
+              Cancel reimbursement?
             </AlertDialogHeader>
             <AlertDialogBody>
-              Essa ação muda o status para CANCELED e não pode ser desfeita.
+              This action will change the status to CANCELED and cannot be undone.
             </AlertDialogBody>
             <AlertDialogFooter>
               <Button ref={cancelRef} onClick={onClose}>
-                Voltar
+                Go back
               </Button>
               <Button colorScheme="orange" onClick={confirmCancel} ml={3}>
-                Sim, cancelar
+                Yes, cancel
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

@@ -12,7 +12,7 @@ import { NewUser } from './pages/admin/NewUser';
 import { Categories } from './pages/admin/Categories';
 import { ReimbursementDetail } from './pages/ReimbursementDetail';
 
-// Componente temporário para o Dashboard
+
 function DashboardPlaceholder() {
   const { user } = useAuth();
   return (
@@ -20,10 +20,10 @@ function DashboardPlaceholder() {
       <Heading size="lg" color="gray.800">Dashboard</Heading>
       <Box bg="white" p={6} borderRadius="xl" boxShadow="sm" w="full" border="1px solid" borderColor="gray.100">
         <Text fontSize="lg" color="gray.600">
-          Bem-vindo ao sistema, <strong>{user?.name}</strong>!
+          Welcome to the system, <strong>{user?.name}</strong>!
         </Text>
         <Text mt={2} color="gray.500">
-          Você está logado como: <Box as="span" color="brand.600" fontWeight="bold">{user?.role}</Box>
+          You are logged in as: <Box as="span" color="brand.600" fontWeight="bold">{user?.role}</Box>
         </Text>
       </Box>
     </VStack>

@@ -10,11 +10,11 @@ export function Sidebar() {
   const getNavItems = () => {
     const items = [
       { name: 'Dashboard', icon: Home, path: '/', roles: ['EMPLOYEE', 'MANAGER', 'FINANCE', 'ADMIN'] },
-      { name: 'Meus Reembolsos', icon: FileText, path: '/reimbursements', roles: ['EMPLOYEE'] },
-      { name: 'Aprovações', icon: CheckSquare, path: '/approvals', roles: ['MANAGER'] },
-      { name: 'Pagamentos', icon: DollarSign, path: '/payments', roles: ['FINANCE'] },
-      { name: 'Usuários', icon: Users, path: '/admin/users', roles: ['ADMIN'] },
-      { name: 'Categorias', icon: Tags, path: '/admin/categories', roles: ['ADMIN'] },
+      { name: 'My reimbursements', icon: FileText, path: '/reimbursements', roles: ['EMPLOYEE'] },
+      { name: 'Approvals', icon: CheckSquare, path: '/approvals', roles: ['MANAGER'] },
+      { name: 'Payments', icon: DollarSign, path: '/payments', roles: ['FINANCE'] },
+      { name: 'Users', icon: Users, path: '/admin/users', roles: ['ADMIN'] },
+      { name: 'Categories', icon: Tags, path: '/admin/categories', roles: ['ADMIN'] },
     ];
     return items.filter(item => item.roles.includes(user?.role || ''));
   };
@@ -94,7 +94,7 @@ export function Sidebar() {
           onClick={logout}
           size="sm"
         >
-          Sair
+          Logout
         </Button>
       </Box>
     </Box>

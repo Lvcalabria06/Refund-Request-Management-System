@@ -22,11 +22,11 @@ import { api } from '../../services/api';
 
 // Mesmo formato do createUserSchema do backend
 const newUserSchema = z.object({
-  name: z.string().min(2, 'O nome deve ter no mínimo 2 caracteres'),
-  email: z.string().email('E-mail inválido'),
-  password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
   role: z.enum(['EMPLOYEE', 'MANAGER', 'FINANCE', 'ADMIN'], {
-    error: 'Selecione um cargo válido',
+    error: 'Select a valid role',
   }),
 });
 
@@ -51,8 +51,8 @@ export function NewUser() {
       await api.post('/users', data);
 
       toast({
-        title: 'Usuário criado!',
-        description: `${data.name} foi cadastrado com sucesso como ${data.role}.`,
+        title: 'User created!',
+        description: `${data.name} was registered successfully as ${data.role}.`,
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -62,8 +62,8 @@ export function NewUser() {
     } catch (err) {
       const error = err as { response?: { data?: { error?: string } } };
       toast({
-        title: 'Erro ao criar usuário',
-        description: error.response?.data?.error || 'Verifique os dados e tente novamente.',
+        title: 'Failed to create user',
+        description: error.response?.data?.error || 'Check the fields and try again.',
         status: 'error',
         duration: 3000,
         isClosable: true,

@@ -19,7 +19,7 @@ import {
   useToast,
   Link as ChakraLink,
 } from '@chakra-ui/react';
-import { ArrowLeft, Paperclip, Clock, Plus, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Paperclip, Clock, Plus, ExternalLink, Trash2 } from 'lucide-react';
 import { api } from '../services/api';
 import dayjs from 'dayjs';
 
@@ -102,19 +102,19 @@ export function ReimbursementDetail() {
     const type = detectFileType(file);
     if (!type) {
       toast({
-        title: 'Tipo de arquivo não permitido',
-        description: 'Aceitos apenas: PDF, JPG ou PNG.',
+        title: 'File type not allowed',
+        description: 'Only PDF, JPG or PNG are accepted.',
         status: 'warning',
       });
       e.target.value = '';
       return;
     }
 
-    // Limite de 5MB para evitar payloads gigantes em base64
+    // 5MB limit to avoid huge base64 payloads
     if (file.size > 5 * 1024 * 1024) {
       toast({
-        title: 'Arquivo muito grande',
-        description: 'O limite é 5MB.',
+        title: 'File too large',
+        description: 'The limit is 5MB.',
         status: 'warning',
       });
       e.target.value = '';
@@ -140,8 +140,8 @@ export function ReimbursementDetail() {
     } catch (err) {
       const error = err as { response?: { data?: { error?: string } } };
       toast({
-        title: 'Erro ao carregar solicitação',
-        description: error.response?.data?.error || 'Tente novamente mais tarde.',
+        title: 'Failed to load reimbursement',
+        description: error.response?.data?.error || 'Please try again later.',
         status: 'error',
         duration: 3000,
       });
@@ -154,9 +154,26 @@ export function ReimbursementDetail() {
     loadAll();
   }, [id]);
 
+  const handleDeleteAttachment = async (attachmentId: string) => {
+    if (!confirm('Remove this attachment?')) return;
+    try {
+      await api.delete(`/reimbursements/${id}/attachments/${attachmentId}`);
+      toast({ title: 'Attachment removed', status: 'success', duration: 3000 });
+      const attRes = await api.get(`/reimbursements/${id}/attachments`);
+      setAttachments(attRes.data);
+    } catch (err) {
+      const error = err as { response?: { data?: { error?: string } } };
+      toast({
+        title: 'Failed to remove attachment',
+        description: error.response?.data?.error || 'Please try again.',
+        status: 'error',
+      });
+    }
+  };
+
   const handleAddAttachment = async () => {
     if (!selectedFile || !detectedFileType) {
-      toast({ title: 'Selecione um arquivo.', status: 'warning' });
+      toast({ title: 'Please select a file.', status: 'warning' });
       return;
     }
     try {
@@ -169,7 +186,7 @@ export function ReimbursementDetail() {
         fileType: detectedFileType,
       });
 
-      toast({ title: 'Anexo adicionado com sucesso!', status: 'success' });
+      toast({ title: 'Attachment added successfully!', status: 'success' });
       setSelectedFile(null);
       setDetectedFileType(null);
       setShowAttachmentForm(false);
@@ -179,8 +196,8 @@ export function ReimbursementDetail() {
     } catch (err) {
       const error = err as { response?: { data?: { error?: string; errors?: unknown } } };
       toast({
-        title: 'Erro ao adicionar anexo',
-        description: error.response?.data?.error || 'Verifique os dados e tente novamente.',
+        title: 'Failed to add attachment',
+        description: error.response?.data?.error || 'Check the fields and try again.',
         status: 'error',
       });
     } finally {
@@ -199,7 +216,7 @@ export function ReimbursementDetail() {
   if (!reimbursement) {
     return (
       <Box>
-        <Text color="gray.500">Solicitação não encontrada.</Text>
+        <Text color="gray.500">Reimbursement not found.</Text>
       </Box>
     );
   }
@@ -406,12 +423,25 @@ export function ReimbursementDetail() {
                     </Badge>
                   </Box>
                 </HStack>
-                <ChakraLink href={att.url} isExternal color="brand.500">
-                  <HStack spacing={1}>
-                    <Text fontSize="sm">Abrir</Text>
-                    <Icon as={ExternalLink} boxSize={3} />
-                  </HStack>
-                </ChakraLink>
+                <HStack spacing={3}>
+                  <ChakraLink href={att.url} isExternal color="brand.500">
+                    <HStack spacing={1}>
+                      <Text fontSize="sm">Abrir</Text>
+                      <Icon as={ExternalLink} boxSize={3} />
+                    </HStack>
+                  </ChakraLink>
+                  {canAddAttachment && (
+                    <Button
+                      size="xs"
+                      variant="ghost"
+                      colorScheme="red"
+                      onClick={() => handleDeleteAttachment(att.id)}
+                      aria-label="Remover anexo"
+                    >
+                      <Icon as={Trash2} boxSize={4} />
+                    </Button>
+                  )}
+                </HStack>
               </Flex>
             ))}
           </VStack>

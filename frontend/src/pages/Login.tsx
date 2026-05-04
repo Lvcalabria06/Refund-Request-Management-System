@@ -22,8 +22,8 @@ import { api } from '../services/api';
 import { LogIn } from 'lucide-react';
 
 const loginSchema = z.object({
-  email: z.string().min(1, 'E-mail é obrigatório').email('E-mail inválido'),
-  password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
+  email: z.string().min(1, 'Email is required').email('Invalid email'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -51,8 +51,8 @@ export function Login() {
       login(token, user);
 
       toast({
-        title: 'Login realizado com sucesso!',
-        description: `Bem-vindo de volta, ${user.name}.`,
+        title: 'Login successful!',
+        description: `Welcome back, ${user.name}.`,
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -63,8 +63,8 @@ export function Login() {
     } catch (err) {
       const error = err as { response?: { data?: { error?: string } } };
       toast({
-        title: 'Erro ao fazer login',
-        description: error.response?.data?.error || 'Credenciais inválidas.',
+        title: 'Login failed',
+        description: error.response?.data?.error || 'Invalid credentials.',
         status: 'error',
         duration: 3000,
         isClosable: true,

@@ -154,14 +154,16 @@ DRAFT/SUBMITTED ───────cancel───► CANCELED ◄──┘
 ### Backend
 - ✅ Login com JWT (1 dia de validade) e senha hasheada com bcrypt
 - ✅ Middleware de autenticação (`authMiddleware`) e de permissão por perfil (`roleMiddleware`)
-- ✅ CRUD de categorias (criar, editar, ativar/desativar)
-- ✅ CRUD de solicitações de reembolso (criar, listar, ver detalhe, editar enquanto DRAFT)
+- ✅ **CRUD completo de usuários** (criar, listar, ver detalhe, editar, deletar — restrito a ADMIN)
+- ✅ **CRUD completo de categorias** (criar, listar, editar, ativar/desativar)
+- ✅ **CRUD completo de solicitações de reembolso** (criar, listar, ver detalhe, editar enquanto DRAFT, cancelar)
+- ✅ **CRUD completo de anexos** (criar, listar, ver, renomear e deletar — só pelo dono em DRAFT/SUBMITTED)
 - ✅ Envio, aprovação, rejeição (com justificativa), pagamento e cancelamento
-- ✅ Upload e listagem de anexos vinculados à solicitação
 - ✅ Histórico de auditoria — toda ação relevante gera registro com autor, data e observação
 - ✅ Validação de body e params com Zod
 - ✅ Manipulação de datas com DayJS (incluindo regra de "data não pode ser futura")
 - ✅ Tratamento de erros HTTP coerente: 400, 401, 403, 404, 500
+- ✅ Bloqueio de submit sem anexo para reembolsos acima de R$ 500
 
 ### Frontend
 - ✅ Tela de Login com validação visual de campos
@@ -274,7 +276,10 @@ Base URL: `http://localhost:3333`
 | Método | Rota | Auth | Descrição |
 |---|---|---|---|
 | GET | `/users` | ADMIN | Lista todos os usuários |
+| GET | `/users/:id` | ADMIN | Detalhes de um usuário |
 | POST | `/users` | ADMIN | Cria novo usuário |
+| PUT | `/users/:id` | ADMIN | Atualiza nome, e-mail, senha e/ou role (parcial) |
+| DELETE | `/users/:id` | ADMIN | Remove usuário (não permitido para si mesmo nem se houver reembolsos/histórico) |
 
 ### Categorias
 | Método | Rota | Auth | Descrição |
@@ -299,6 +304,9 @@ Base URL: `http://localhost:3333`
 | GET | `/reimbursements/:id/history` | qualquer com acesso | Lista histórico |
 | POST | `/reimbursements/:id/attachments` | EMPLOYEE dono | Adiciona anexo |
 | GET | `/reimbursements/:id/attachments` | qualquer com acesso | Lista anexos |
+| GET | `/reimbursements/:id/attachments/:attachmentId` | qualquer com acesso | Detalhes de um anexo |
+| PUT | `/reimbursements/:id/attachments/:attachmentId` | EMPLOYEE dono | Renomeia anexo (DRAFT/SUBMITTED apenas) |
+| DELETE | `/reimbursements/:id/attachments/:attachmentId` | EMPLOYEE dono | Remove anexo (DRAFT/SUBMITTED apenas) |
 
 ### Status HTTP retornados
 | Cenário | Status |

@@ -9,10 +9,10 @@ import { api } from '../../services/api';
 import dayjs from 'dayjs';
 
 const newReimbursementSchema = z.object({
-  description: z.string().min(5, 'A descrição deve ter no mínimo 5 caracteres'),
-  amount: z.number({ message: 'Valor inválido' }).min(0.01, 'O valor deve ser maior que zero'),
-  expenseDate: z.string().min(1, 'Data é obrigatória'),
-  categoryId: z.string().min(1, 'Categoria é obrigatória'),
+  description: z.string().min(5, 'Description must be at least 5 characters'),
+  amount: z.number({ message: 'Invalid amount' }).min(0.01, 'Amount must be greater than zero'),
+  expenseDate: z.string().min(1, 'Date is required'),
+  categoryId: z.string().min(1, 'Category is required'),
 });
 
 type FormData = z.infer<typeof newReimbursementSchema>;
@@ -54,7 +54,7 @@ export function NewReimbursement() {
         if (isEditMode) {
           const { data } = await api.get(`/reimbursements/${id}`);
           if (data.status !== 'DRAFT') {
-            toast({ title: 'Aviso', description: 'Apenas rascunhos podem ser editados.', status: 'warning' });
+            toast({ title: 'Warning', description: 'Only drafts can be edited.', status: 'warning' });
             navigate('/reimbursements');
             return;
           }
@@ -64,7 +64,7 @@ export function NewReimbursement() {
           setValue('categoryId', data.categoryId);
         }
       } catch (err) {
-        toast({ title: 'Erro', description: 'Erro ao carregar dados.', status: 'error' });
+        toast({ title: 'Error', description: 'Failed to load data.', status: 'error' });
         navigate('/reimbursements');
       } finally {
         setInitialLoading(false);
@@ -85,18 +85,18 @@ export function NewReimbursement() {
       
       if (isEditMode) {
         await api.put(`/reimbursements/${id}`, payload);
-        toast({ title: 'Sucesso!', description: 'Rascunho atualizado.', status: 'success' });
+        toast({ title: 'Success!', description: 'Draft updated.', status: 'success' });
       } else {
         await api.post('/reimbursements', payload);
-        toast({ title: 'Sucesso!', description: 'Solicitação criada como Rascunho (DRAFT).', status: 'success' });
+        toast({ title: 'Success!', description: 'Reimbursement created as DRAFT.', status: 'success' });
       }
 
       navigate('/reimbursements');
     } catch (err) {
       const error = err as { response?: { data?: { error?: string } } };
       toast({
-        title: 'Erro',
-        description: error.response?.data?.error || 'Erro ao salvar solicitação.',
+        title: 'Error',
+        description: error.response?.data?.error || 'Failed to save reimbursement.',
         status: 'error',
       });
     } finally {

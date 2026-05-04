@@ -13,7 +13,7 @@ interface Category {
 }
 
 const categorySchema = z.object({
-  name: z.string().min(3, 'O nome deve ter no mínimo 3 caracteres'),
+  name: z.string().min(3, 'Name must be at least 3 characters'),
 });
 
 type CategoryFormData = z.infer<typeof categorySchema>;
@@ -63,19 +63,19 @@ export function Categories() {
     try {
       setIsSubmitting(true);
       if (editingCategory) {
-        // Modo Edição
+        // Edit mode
         await api.patch(`/categories/${editingCategory.id}`, { name: data.name, isActive: editingCategory.isActive });
-        toast({ title: 'Categoria atualizada!', status: 'success' });
+        toast({ title: 'Category updated!', status: 'success' });
       } else {
-        // Modo Criação
+        // Create mode
         await api.post('/categories', { name: data.name });
-        toast({ title: 'Categoria criada com sucesso!', status: 'success' });
+        toast({ title: 'Category created successfully!', status: 'success' });
       }
       onClose();
       loadCategories();
     } catch (err) {
       const error = err as { response?: { data?: { error?: string } } };
-      toast({ title: 'Erro', description: error.response?.data?.error || 'Erro ao salvar categoria', status: 'error' });
+      toast({ title: 'Error', description: error.response?.data?.error || 'Failed to save category', status: 'error' });
     } finally {
       setIsSubmitting(false);
     }
@@ -84,11 +84,11 @@ export function Categories() {
   const toggleCategory = async (id: string, currentStatus: boolean, name: string) => {
     try {
       await api.patch(`/categories/${id}`, { name, isActive: !currentStatus });
-      toast({ title: 'Status atualizado', status: 'success' });
+      toast({ title: 'Status updated', status: 'success' });
       loadCategories();
     } catch (err) {
       const error = err as { response?: { data?: { error?: string } } };
-      toast({ title: 'Erro', description: error.response?.data?.error || 'Erro ao atualizar', status: 'error' });
+      toast({ title: 'Error', description: error.response?.data?.error || 'Failed to update', status: 'error' });
     }
   };
 
