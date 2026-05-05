@@ -1,0 +1,760 @@
+{
+  "info": {
+    "_postman_id": "cf4a7a9c-215d-4a0e-b06e-946bf17a852c",
+    "name": "Pitang Refunds API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "43686809",
+    "_collection_link": "https://go.postman.co/collection/43686809-cf4a7a9c-215d-4a0e-b06e-946bf17a852c?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const data = pm.response.json();\r",
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Returns token\", () => pm.expect(data.token).to.be.a('string'));\r",
+                  "\r",
+                  "if (pm.response.code === 200) {\r",
+                  "  pm.collectionVariables.set('token_employee', data.token);\r",
+                  "  pm.collectionVariables.set('userId', data.user.id);\r",
+                  "  console.log('Employee token saved.');\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"employee@pitang.com\",\r\n  \"password\": \"123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3333/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3333",
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users(ADMIN)",
+      "item": [
+        {
+          "name": "GET List Users",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImVjNzUxMDNmLWU1NjgtNGRhZi1iMjM3LTJhZTU0MzU2N2Y1NSIsImVtYWlsIjoiYWRtaW5AcGl0YW5nLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3NzY2NzIwMiwiZXhwIjoxNzc3NzUzNjAyfQ.1Ex35lZiJMiMjRCA8oCLKZMpBaKMgLFMOAWLpFrrI3g",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Hacker User2\",\r\n  \"email\": \"hacker2@teste.com\",\r\n  \"password\": \"987654\",\r\n  \"role\": \"ADMIN\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3333/users",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3333",
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST  Create User",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Novo Usuário\",\r\n  \"email\": \"novo@pitang.com\",\r\n  \"password\": \"123456\",\r\n  \"role\": \"EMPLOYEE\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3333/users",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3333",
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE user",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3333/users/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3333",
+              "path": [
+                "users",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPDATE user",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Updated Name\",\r\n  \"email\": \"updated@pitang.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3333/users/166dcd08-6867-457a-ba44-ea35f72d81c2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3333",
+              "path": [
+                "users",
+                "166dcd08-6867-457a-ba44-ea35f72d81c2"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "GET list all (ADMIN)",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "GET list Active",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "POST  Create Category (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH Update Category (ADMIN)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImVjNzUxMDNmLWU1NjgtNGRhZi1iMjM3LTJhZTU0MzU2N2Y1NSIsImVtYWlsIjoiYWRtaW5AcGl0YW5nLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3NzkxOTUyMCwiZXhwIjoxNzc4MDA1OTIwfQ.TlrqMJqKTukZiVBkPlZifmvF61Z3MxoaoD33jeZVW0Y",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Business Travel\",\r\n  \"isActive\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3333/categories/e35e0eda-277a-4f31-ae11-fcd98f30a806",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3333",
+              "path": [
+                "categories",
+                "e35e0eda-277a-4f31-ae11-fcd98f30a806"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImVjNzUxMDNmLWU1NjgtNGRhZi1iMjM3LTJhZTU0MzU2N2Y1NSIsImVtYWlsIjoiYWRtaW5AcGl0YW5nLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3Nzk5ODA1MiwiZXhwIjoxNzc4MDg0NDUyfQ.Km_M5LcD2nXcG5zYmbOMBUfkY9v_WklZCM3EbX3XJJk",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reimbursements",
+      "item": [
+        {
+          "name": "Workflow",
+          "item": [
+            {
+              "name": "Submit",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQ3MTUwYjc0LTViMTEtNGRlZi1iYzcxLWE4NTliN2YyNGU1YiIsImVtYWlsIjoiZW1wbG95ZWVAcGl0YW5nLmNvbSIsInJvbGUiOiJFTVBMT1lFRSIsImlhdCI6MTc3Nzk5ODIwNywiZXhwIjoxNzc4MDg0NjA3fQ.bpzfzAEgqe_we9NrAtuDHQ5sQyiasF7Nj8WU2HCQZcI",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"Business Travel\",\r\n  \"isActive\": true\r\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3333/reimbursements/00b1d0aa-84aa-483d-9332-0419277a851a/submit",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3333",
+                  "path": [
+                    "reimbursements",
+                    "00b1d0aa-84aa-483d-9332-0419277a851a",
+                    "submit"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Approve",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE3ZWVhZTRiLWQzODAtNGE4OS1hZGU0LThhYjE0MTQ3OGExZiIsImVtYWlsIjoibWFuYWdlckBwaXRhbmcuY29tIiwicm9sZSI6Ik1BTkFHRVIiLCJpYXQiOjE3Nzc5OTkxNDksImV4cCI6MTc3ODA4NTU0OX0.N-i4WwoPgOV-3-IPNBk0ad2gx-satAOODQHG4eKujyo",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3333/reimbursements/00b1d0aa-84aa-483d-9332-0419277a851a/approve",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3333",
+                  "path": [
+                    "reimbursements",
+                    "00b1d0aa-84aa-483d-9332-0419277a851a",
+                    "approve"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Reject",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "http://localhost:3333/reimbursements/00b1d0aa-84aa-483d-9332-0419277a851a/approve",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3333/reimbursements/00b1d0aa-84aa-483d-9332-0419277a851a/reject",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3333",
+                  "path": [
+                    "reimbursements",
+                    "00b1d0aa-84aa-483d-9332-0419277a851a",
+                    "reject"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Pay",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE2NmRjZDA4LTY4NjctNDU3YS1iYTQ0LWVhMzVmNzJkODFjMiIsImVtYWlsIjoiZmluYW5jZUBwaXRhbmcuY29tIiwicm9sZSI6IkZJTkFOQ0UiLCJpYXQiOjE3Nzc5OTkzMTIsImV4cCI6MTc3ODA4NTcxMn0.MmIHaoB8qmcM3x1CjnGLbAl2V8w_QgvoT3PE-Y9D1VM",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3333/reimbursements/00b1d0aa-84aa-483d-9332-0419277a851a/pay",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3333",
+                  "path": [
+                    "reimbursements",
+                    "00b1d0aa-84aa-483d-9332-0419277a851a",
+                    "pay"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Cancel",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3333/reimbursements/00b1d0aa-84aa-483d-9332-0419277a851a/cancel",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3333",
+                  "path": [
+                    "reimbursements",
+                    "00b1d0aa-84aa-483d-9332-0419277a851a",
+                    "cancel"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Attachments",
+          "item": [
+            {
+              "name": "POST attachments",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 201) {\r",
+                      "  pm.collectionVariables.set('attachmentId', pm.response.json().id);\r",
+                      "}"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"fileName\": \"receipt.pdf\",\r\n  \"url\": \"https://example.com/receipt.pdf\",\r\n  \"fileType\": \"PDF\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3333/reimbursements/00b1d0aa-84aa-483d-9332-0419277a851a/attachments",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3333",
+                  "path": [
+                    "reimbursements",
+                    "00b1d0aa-84aa-483d-9332-0419277a851a",
+                    "attachments"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GET attachment by Id",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3333/reimbursements/00b1d0aa-84aa-483d-9332-0419277a851a/attachments/2df1901b-a73d-4296-aa8c-1ea17e4c9a52",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3333",
+                  "path": [
+                    "reimbursements",
+                    "00b1d0aa-84aa-483d-9332-0419277a851a",
+                    "attachments",
+                    "2df1901b-a73d-4296-aa8c-1ea17e4c9a52"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GET all",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3333/reimbursements/00b1d0aa-84aa-483d-9332-0419277a851a/attachments",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3333",
+                  "path": [
+                    "reimbursements",
+                    "00b1d0aa-84aa-483d-9332-0419277a851a",
+                    "attachments"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "PUT Attachment Name",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{ \"fileName\": \"renamed_receipt.pdf\" }",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3333/reimbursements/00b1d0aa-84aa-483d-9332-0419277a851a/attachments",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3333",
+                  "path": [
+                    "reimbursements",
+                    "00b1d0aa-84aa-483d-9332-0419277a851a",
+                    "attachments"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "DELETE attachment",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3333/reimbursements/00b1d0aa-84aa-483d-9332-0419277a851a/attachments/2df1901b-a73d-4296-aa8c-1ea17e4c9a52",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3333",
+                  "path": [
+                    "reimbursements",
+                    "00b1d0aa-84aa-483d-9332-0419277a851a",
+                    "attachments",
+                    "2df1901b-a73d-4296-aa8c-1ea17e4c9a52"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "CRUD",
+          "item": [
+            {
+              "name": "PUT reimbursements",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"description\": \"Updated description\",\r\n  \"amount\": 200.00\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3333/reimbursements/00b1d0aa-84aa-483d-9332-0419277a851a",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3333",
+                  "path": [
+                    "reimbursements",
+                    "00b1d0aa-84aa-483d-9332-0419277a851a"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GET by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3333/reimbursements/00b1d0aa-84aa-483d-9332-0419277a851a",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3333",
+                  "path": [
+                    "reimbursements",
+                    "00b1d0aa-84aa-483d-9332-0419277a851a"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GET reimbursements",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3333/reimbursements",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3333",
+                  "path": [
+                    "reimbursements"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "POST reimbursements",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"description\": \"Lunch with corporate client\",\r\n  \"amount\": 150.00,\r\n  \"expenseDate\": \"2026-04-15T00:00:00.000Z\",\r\n  \"categoryId\": \"{{categoryId}}\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3333/Reimbursements",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3333",
+                  "path": [
+                    "Reimbursements"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "History",
+          "item": [
+            {
+              "name": "GET History",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3333/reimbursements/00b1d0aa-84aa-483d-9332-0419277a851a/history",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3333",
+                  "path": [
+                    "reimbursements",
+                    "00b1d0aa-84aa-483d-9332-0419277a851a",
+                    "history"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQ3MTUwYjc0LTViMTEtNGRlZi1iYzcxLWE4NTliN2YyNGU1YiIsImVtYWlsIjoiZW1wbG95ZWVAcGl0YW5nLmNvbSIsInJvbGUiOiJFTVBMT1lFRSIsImlhdCI6MTc3Nzk5ODIwNywiZXhwIjoxNzc4MDg0NjA3fQ.bpzfzAEgqe_we9NrAtuDHQ5sQyiasF7Nj8WU2HCQZcI",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

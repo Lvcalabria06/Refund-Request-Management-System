@@ -342,6 +342,33 @@ Base URL: `http://localhost:3333`
 
 ---
 
-## Autor
+## Postman Collection
 
+Uma collection completa do Postman está disponível em
+[`docs/Pitang Refunds API.postman_collection.json`](./docs/Pitang%20Refunds%20API.postman_collection.json).
+
+### Como usar
+1. Abra o Postman → **Import** → arraste o arquivo `.json`
+2. A collection vem com:
+   - Variável `baseUrl` apontando para `http://localhost:3333`
+   - Tokens populados automaticamente após cada Login
+   - Scripts de teste que salvam `categoryId`, `reimbursementId` e `attachmentId`
+   - 4 contas de teste (EMPLOYEE / MANAGER / FINANCE / ADMIN)
+
+### Ordem sugerida de execução
+```
+1. Auth → Login (Employee)
+2. Auth → Login (Manager)
+3. Auth → Login (Finance)
+4. Auth → Login (Admin)
+5. Categories → List Active                    [popula categoryId]
+6. Reimbursements → CRUD → Create               [popula reimbursementId]
+7. Reimbursements → Workflow → Submit
+8. Reimbursements → Workflow → Approve
+9. Reimbursements → Workflow → Pay
+10. Reimbursements → History → Get History      [vê toda a trilha]
+```
+
+## Autor
+Lucas Valois Calabria
 Desenvolvido como parte do desafio técnico para a Pitang.
