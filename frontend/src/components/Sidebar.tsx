@@ -11,6 +11,7 @@ export function Sidebar() {
     const items = [
       { name: 'Dashboard', icon: Home, path: '/', roles: ['EMPLOYEE', 'MANAGER', 'FINANCE', 'ADMIN'] },
       { name: 'My reimbursements', icon: FileText, path: '/reimbursements', roles: ['EMPLOYEE'] },
+      { name: 'All Reimbursements', icon: FileText, path: '/admin/reimbursements', roles: ['ADMIN'] },
       { name: 'Approvals', icon: CheckSquare, path: '/approvals', roles: ['MANAGER'] },
       { name: 'Payments', icon: DollarSign, path: '/payments', roles: ['FINANCE'] },
       { name: 'Users', icon: Users, path: '/admin/users', roles: ['ADMIN'] },

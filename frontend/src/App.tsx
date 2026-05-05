@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Box, Heading, Text, VStack } from '@chakra-ui/react';
-import { Login } from './pages/Login';
 import { useAuth } from './contexts/AuthContext';
+import { Login } from './pages/Login';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { MyReimbursements } from './pages/employee/MyReimbursements';
 import { NewReimbursement } from './pages/employee/NewReimbursement';
@@ -11,24 +10,10 @@ import { Users } from './pages/admin/Users';
 import { NewUser } from './pages/admin/NewUser';
 import { Categories } from './pages/admin/Categories';
 import { ReimbursementDetail } from './pages/ReimbursementDetail';
+import { AdminReimbursements } from './pages/admin/AdminReimbursements';
+import { Dashboard } from './pages/Dashboard';
 
 
-function DashboardPlaceholder() {
-  const { user } = useAuth();
-  return (
-    <VStack align="flex-start" spacing={6} w="full">
-      <Heading size="lg" color="gray.800">Dashboard</Heading>
-      <Box bg="white" p={6} borderRadius="xl" boxShadow="sm" w="full" border="1px solid" borderColor="gray.100">
-        <Text fontSize="lg" color="gray.600">
-          Welcome to the system, <strong>{user?.name}</strong>!
-        </Text>
-        <Text mt={2} color="gray.500">
-          You are logged in as: <Box as="span" color="brand.600" fontWeight="bold">{user?.role}</Box>
-        </Text>
-      </Box>
-    </VStack>
-  );
-}
 
 function App() {
   const { isAuthenticated } = useAuth();
@@ -44,7 +29,7 @@ function App() {
         path="/"
         element={
           <ProtectedRoute>
-            <DashboardPlaceholder />
+            <Dashboard />
           </ProtectedRoute>
         }
       />
@@ -53,7 +38,7 @@ function App() {
       <Route
         path="/reimbursements"
         element={
-          <ProtectedRoute allowedRoles={['EMPLOYEE']}>
+          <ProtectedRoute allowedRoles={['EMPLOYEE','ADMIN']}>
             <MyReimbursements />
           </ProtectedRoute>
         }
@@ -126,6 +111,14 @@ function App() {
         element={
           <ProtectedRoute allowedRoles={['ADMIN']}>
             <Categories />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/reimbursements"
+        element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <AdminReimbursements />
           </ProtectedRoute>
         }
       />
