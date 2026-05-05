@@ -94,7 +94,7 @@ export function Login() {
             </Heading>
             <Text color="gray.500">Sign in to manage your reimbursement requests.</Text>
           </VStack>
-
+    
           <form onSubmit={handleSubmit(onSubmit)}>
             <VStack spacing={4}>
               <FormControl isInvalid={!!errors.email}>

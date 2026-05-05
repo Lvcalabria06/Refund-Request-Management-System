@@ -5,7 +5,11 @@ import dayjs from 'dayjs';
 
 export class ReimbursementService {
 
-  async create(employeeId: string, data: z.infer<typeof createReimbursementSchema>) {
+  async create(user: { id: string; role: string }, data: z.infer<typeof createReimbursementSchema>) {
+    if (user.role !== 'EMPLOYEE') {
+      throw new Error('Only EMPLOYEE can create reimbursements');
+    }
+
     const category = await prisma.category.findUnique({
       where: { id: data.categoryId },
     });
@@ -26,7 +30,7 @@ export class ReimbursementService {
           amount: data.amount,
           expenseDate: expenseDate.toDate(),
           categoryId: data.categoryId,
-          employeeId,
+          employeeId: user.id,
           status: 'DRAFT',
         },
       });
@@ -35,7 +39,7 @@ export class ReimbursementService {
         data: {
           action: 'CREATED',
           reimbursementId: reimbursement.id,
-          authorId: employeeId,
+          authorId: user.id,
           notes: 'Reimbursement draft created',
         },
       });
@@ -299,7 +303,6 @@ export class ReimbursementService {
   }
 
   async addAttachment(id: string, data: z.infer<typeof createAttachmentSchema>, user: { id: string; role: string }) {
-    
     const reimbursement = await this.findById(id, user);
 
     if (reimbursement.employeeId !== user.id) {

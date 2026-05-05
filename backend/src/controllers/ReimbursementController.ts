@@ -46,9 +46,9 @@ function handleError(res: Response, error: any) {
 export class ReimbursementController {
   async create(req: Request, res: Response) {
     try {
-      const employeeId = req.user!.id;
+      const user = req.user!;
       const validatedData = createReimbursementSchema.parse(req.body);
-      const reimbursement = await reimbursementService.create(employeeId, validatedData);
+      const reimbursement = await reimbursementService.create(user, validatedData);
       res.status(201).json(reimbursement);
     } catch (error: any) {
       handleError(res, error);
