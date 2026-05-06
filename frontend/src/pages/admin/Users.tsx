@@ -34,8 +34,10 @@ import {
   AlertDialogHeader,
   AlertDialogContent,
   AlertDialogOverlay,
+  InputGroup,
+  InputLeftElement,
 } from '@chakra-ui/react';
-import { UserPlus, Edit2, Trash2 } from 'lucide-react';
+import { UserPlus, Edit2, Trash2, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -76,6 +78,17 @@ export function Users() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [deletingUser, setDeletingUser] = useState<User | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(''); // search by name or email
+
+  // Case-insensitive search across name and email
+  const filteredUsers = users.filter((u) => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return true;
+    return (
+      u.name.toLowerCase().includes(term) ||
+      u.email.toLowerCase().includes(term)
+    );
+  });
   const navigate = useNavigate();
   const toast = useToast();
   const { user: loggedUser } = useAuth();
@@ -180,11 +193,29 @@ export function Users() {
         </Button>
       </Flex>
 
+      {/* Search by employee name or email */}
+      <InputGroup mb={4} maxW="400px">
+        <InputLeftElement pointerEvents="none">
+          <Icon as={Search} color="gray.400" boxSize={4} />
+        </InputLeftElement>
+        <Input
+          placeholder="Search by name or email..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          bg="white"
+          focusBorderColor="brand.500"
+        />
+      </InputGroup>
+
       <Box bg="white" borderRadius="xl" boxShadow="sm" border="1px solid" borderColor="gray.100" overflow="hidden">
         {loading ? (
           <Flex justify="center" p={10}><Spinner color="brand.500" size="xl" /></Flex>
-        ) : users.length === 0 ? (
-          <Flex justify="center" p={10}><Text color="gray.500">No users found.</Text></Flex>
+        ) : filteredUsers.length === 0 ? (
+          <Flex justify="center" p={10}>
+            <Text color="gray.500">
+              {searchTerm ? `No users matching "${searchTerm}".` : 'No users found.'}
+            </Text>
+          </Flex>
         ) : (
           <Box overflowX="auto">
             <Table variant="simple">
@@ -197,7 +228,7 @@ export function Users() {
                 </Tr>
               </Thead>
               <Tbody>
-                {users.map((u) => {
+                {filteredUsers.map((u) => {
                   const isSelf = u.id === loggedUser?.id;
                   return (
                     <Tr key={u.id} _hover={{ bg: 'gray.50' }}>

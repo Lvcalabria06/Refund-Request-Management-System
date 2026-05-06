@@ -23,7 +23,7 @@ export function Categories() {
   const [loading, setLoading] = useState(true);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
 
@@ -96,7 +96,7 @@ export function Categories() {
     <Box>
       <Flex justify="space-between" align="center" mb={6}>
         <Heading size="lg" color="gray.800">Refund Categories</Heading>
-        <Button colorScheme="brand" leftIcon={<Icon as={Plus} boxSize={4}/>} onClick={openCreateModal}>
+        <Button colorScheme="brand" leftIcon={<Icon as={Plus} boxSize={4} />} onClick={openCreateModal}>
           New Category
         </Button>
       </Flex>
@@ -127,20 +127,20 @@ export function Categories() {
                     </Td>
                     <Td>
                       <Flex gap={2}>
-                        <Button 
-                          size="sm" 
-                          colorScheme="blue" 
+                        <Button
+                          size="sm"
+                          colorScheme="blue"
                           variant="ghost"
-                          leftIcon={<Icon as={Edit2} boxSize={4}/>}
+                          leftIcon={<Icon as={Edit2} boxSize={4} />}
                           onClick={() => openEditModal(cat)}
                         >
                           Edit
                         </Button>
-                        <Button 
-                          size="sm" 
-                          colorScheme={cat.isActive ? 'red' : 'green'} 
+                        <Button
+                          size="sm"
+                          colorScheme={cat.isActive ? 'red' : 'green'}
                           variant="ghost"
-                          leftIcon={<Icon as={cat.isActive ? PowerOff : Power} boxSize={4}/>}
+                          leftIcon={<Icon as={cat.isActive ? PowerOff : Power} boxSize={4} />}
                           onClick={() => toggleCategory(cat.id, cat.isActive, cat.name)}
                         >
                           {cat.isActive ? 'Disable' : 'Activate'}
@@ -165,10 +165,10 @@ export function Categories() {
             <ModalBody>
               <FormControl isInvalid={!!errors.name}>
                 <FormLabel>Category Name</FormLabel>
-                <Input 
-                  placeholder="Ex: Travel, Accommodation..." 
-                  focusBorderColor="brand.500" 
-                  {...register('name')} 
+                <Input
+                  placeholder="Ex: Travel, Accommodation..."
+                  focusBorderColor="brand.500"
+                  {...register('name')}
                 />
                 <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
               </FormControl>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Box, Button, Flex, Heading, Table, Thead, Tbody, Tr, Th, Td, Badge, Spinner, Text, Icon, useToast, useDisclosure, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Table, Thead, Tbody, Tr, Th, Td, Badge, Spinner, Text, Icon, useToast, useDisclosure, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Select, HStack } from '@chakra-ui/react';
 import { Plus, Eye, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
@@ -30,10 +30,24 @@ export function MyReimbursements() {
   const [reimbursements, setReimbursements] = useState<Reimbursement[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancelTarget, setCancelTarget] = useState<string | null>(null);
+  // Sorting state — default: most recent expense first
+  const [orderBy, setOrderBy] = useState<'expenseDate' | 'amount'>('expenseDate');
+  const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   const navigate = useNavigate();
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement>(null);
+
+  // Client-side sorting — works on the already loaded list
+  const sortedReimbursements = [...reimbursements].sort((a, b) => {
+    let comparison = 0;
+    if (orderBy === 'expenseDate') {
+      comparison = dayjs(a.expenseDate).valueOf() - dayjs(b.expenseDate).valueOf();
+    } else {
+      comparison = a.amount - b.amount;
+    }
+    return order === 'asc' ? comparison : -comparison;
+  });
 
   const askCancel = (id: string) => {
     setCancelTarget(id);
@@ -75,16 +89,43 @@ export function MyReimbursements() {
 
   return (
     <Box>
-      <Flex justify="space-between" align="center" mb={6}>
+      <Flex justify="space-between" align="center" mb={6} flexWrap="wrap" gap={3}>
         <Heading size="lg" color="gray.800">My Reimbursements</Heading>
-        <Button 
-          colorScheme="brand" 
+        <Button
+          colorScheme="brand"
           leftIcon={<Icon as={Plus} />}
           onClick={() => navigate('/reimbursements/new')}
         >
           New Request
         </Button>
       </Flex>
+
+      {/* Sorting controls */}
+      <HStack spacing={3} mb={4} flexWrap="wrap">
+        <Text fontSize="sm" color="gray.500">Sort by:</Text>
+        <Select
+          size="sm"
+          w="180px"
+          value={orderBy}
+          onChange={(e) => setOrderBy(e.target.value as 'expenseDate' | 'amount')}
+          bg="white"
+          focusBorderColor="brand.500"
+        >
+          <option value="expenseDate">Expense date</option>
+          <option value="amount">Amount</option>
+        </Select>
+        <Select
+          size="sm"
+          w="150px"
+          value={order}
+          onChange={(e) => setOrder(e.target.value as 'asc' | 'desc')}
+          bg="white"
+          focusBorderColor="brand.500"
+        >
+          <option value="desc">Descending</option>
+          <option value="asc">Ascending</option>
+        </Select>
+      </HStack>
 
       <Box bg="white" borderRadius="xl" boxShadow="sm" border="1px solid" borderColor="gray.100" overflow="hidden">
         {loading ? (
@@ -109,7 +150,7 @@ export function MyReimbursements() {
                 </Tr>
               </Thead>
               <Tbody>
-                {reimbursements.map((r) => (
+                {sortedReimbursements.map((r) => (
                   <Tr key={r.id} _hover={{ bg: 'gray.50' }}>
                     <Td fontWeight="medium" color="gray.800">{r.description}</Td>
                     <Td>{r.category?.name}</Td>
