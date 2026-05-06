@@ -89,8 +89,21 @@ Sistema fullstack para gerenciamento de solicitações de reembolso corporativo,
 
 ### Pré-requisitos
 
-- Node.js 18+
-- npm
+- **Node.js 20.19+** (ou 22.12+) — exigido pelo Vite. Se usar `nvm`, basta rodar `nvm use` na raiz do projeto (existe um `.nvmrc` configurado).
+- **npm** (já vem com o Node)
+
+#### Como conferir/atualizar o Node.js
+
+```bash
+node -v                 # confere a versão atual
+
+# Se for menor que 20.19, atualize com nvm:
+nvm install 20.19.0     # instala
+nvm use                 # ativa a versão do .nvmrc
+```
+
+> Se a versão do Node estiver errada, o `npm install` ainda funciona, mas o `npm run dev` falha com erro de
+> `styleText` ou `import` não encontrado. Sempre confira `node -v` antes.
 
 ### 1. Backend
 
