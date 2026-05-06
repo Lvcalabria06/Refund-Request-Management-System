@@ -18,6 +18,12 @@ export class ReimbursementService {
       throw new Error('Category is invalid or inactive');
     }
 
+    if (category.maxAmount !== null && data.amount > category.maxAmount) {
+        throw new Error(
+          `Amount exceeds the limit for category "${category.name}". Maximum allowed: R$ ${category.maxAmount.toFixed(2)}`
+        );
+    }
+
     const expenseDate = dayjs(data.expenseDate);
     if (expenseDate.isAfter(dayjs())) {
       throw new Error('Expense date cannot be in the future');
@@ -63,12 +69,24 @@ export class ReimbursementService {
       throw new Error('Only DRAFT reimbursements can be updated');
     }
 
-    if (data.categoryId) {
+    // Resolve which category and amount apply after the update
+    // (uses the new value if provided, else keeps the current)
+    const effectiveCategoryId = data.categoryId ?? reimbursement.categoryId;
+    const effectiveAmount = data.amount ?? reimbursement.amount;
+
+    if (data.categoryId || data.amount !== undefined) {
       const category = await prisma.category.findUnique({
-        where: { id: data.categoryId },
+        where: { id: effectiveCategoryId },
       });
       if (!category || !category.isActive) {
         throw new Error('Category is invalid or inactive');
+      }
+
+      // EXTRA: enforce per-category spending limit on update too
+      if (category.maxAmount !== null && effectiveAmount > category.maxAmount) {
+        throw new Error(
+          `Amount exceeds the limit for category "${category.name}". Maximum allowed: R$ ${category.maxAmount.toFixed(2)}`
+        );
       }
     }
 

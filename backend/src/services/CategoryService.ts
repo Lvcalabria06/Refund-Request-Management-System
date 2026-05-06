@@ -20,6 +20,7 @@ export class CategoryService {
     return prisma.category.create({
       data: {
         name: data.name,
+        maxAmount: data.maxAmount ?? null,
       },
     });
   }
@@ -32,7 +33,11 @@ export class CategoryService {
 
     return prisma.category.update({
       where: { id },
-      data,
+      data: {
+        name: data.name,
+        isActive: data.isActive,
+        maxAmount: data.maxAmount !== undefined ? data.maxAmount : undefined,
+      },
     });
   }
 }

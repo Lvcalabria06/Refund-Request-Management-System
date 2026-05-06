@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Box, Button, Flex, FormControl, FormErrorMessage, FormLabel, Heading, Input, Select, VStack, useToast, Icon, Spinner } from '@chakra-ui/react';
+import { Box, Button, Flex, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, Input, Select, VStack, useToast, Icon, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
 import { ArrowLeft, Save } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -20,6 +20,7 @@ type FormData = z.infer<typeof newReimbursementSchema>;
 interface Category {
   id: string;
   name: string;
+  maxAmount: number | null; // EXTRA: per-category spending limit
 }
 
 export function NewReimbursement() {
@@ -32,9 +33,19 @@ export function NewReimbursement() {
 
   const isEditMode = !!id;
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(newReimbursementSchema),
   });
+
+  // Watch the selected category and typed amount for live limit validation
+  const watchedCategoryId = watch('categoryId');
+  const watchedAmount = watch('amount');
+  const selectedCategory = categories.find((c) => c.id === watchedCategoryId);
+  const exceedsLimit =
+    selectedCategory?.maxAmount != null &&
+    typeof watchedAmount === 'number' &&
+    !isNaN(watchedAmount) &&
+    watchedAmount > selectedCategory.maxAmount;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -75,6 +86,16 @@ export function NewReimbursement() {
   }, [id, isEditMode, navigate, setValue, toast]);
 
   const onSubmit = async (data: FormData) => {
+    // EXTRA: client-side guard against exceeding the category limit
+    const cat = categories.find((c) => c.id === data.categoryId);
+    if (cat?.maxAmount != null && data.amount > cat.maxAmount) {
+      toast({
+        title: 'Amount above category limit',
+        description: `The maximum for "${cat.name}" is R$ ${cat.maxAmount.toFixed(2)}.`,
+        status: 'warning',
+      });
+      return;
+    }
     try {
       setLoading(true);
       
@@ -145,17 +166,39 @@ export function NewReimbursement() {
               <FormLabel color="gray.700" fontWeight="medium">Category</FormLabel>
               <Select placeholder="Select a category" {...register('categoryId')} focusBorderColor="brand.500">
                 {categories.map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                    {c.maxAmount != null ? ` (max R$ ${c.maxAmount.toFixed(2)})` : ''}
+                  </option>
                 ))}
               </Select>
               <FormErrorMessage>{errors.categoryId?.message}</FormErrorMessage>
+              {selectedCategory?.maxAmount != null && !exceedsLimit && (
+                <FormHelperText color="gray.500">
+                  Maximum allowed for this category: R$ {selectedCategory.maxAmount.toFixed(2)}
+                </FormHelperText>
+              )}
             </FormControl>
+
+            {/* Live warning when amount exceeds the category limit */}
+            {exceedsLimit && selectedCategory?.maxAmount != null && (
+              <Alert status="warning" borderRadius="md">
+                <AlertIcon />
+                Amount exceeds the maximum allowed for "{selectedCategory.name}" (R$ {selectedCategory.maxAmount.toFixed(2)}).
+              </Alert>
+            )}
 
             <Flex justify="flex-end" pt={4}>
               <Button colorScheme="gray" mr={3} onClick={() => navigate('/reimbursements')} variant="outline">
                 Cancel
               </Button>
-              <Button type="submit" colorScheme="brand" isLoading={loading} leftIcon={<Icon as={Save} boxSize={4}/>}>
+              <Button
+                type="submit"
+                colorScheme="brand"
+                isLoading={loading}
+                isDisabled={exceedsLimit}
+                leftIcon={<Icon as={Save} boxSize={4} />}
+              >
                 {isEditMode ? 'Update Draft' : 'Save Draft'}
               </Button>
             </Flex>

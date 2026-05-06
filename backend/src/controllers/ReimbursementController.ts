@@ -31,7 +31,7 @@ function handleError(res: Response, error: any) {
   'Only DRAFT', 'Only SUBMITTED', 'Only APPROVED',
   'Category is invalid', 'Expense date cannot',
   'Attachments can only', 'reimbursements can be',
-  'require at least one attachment',
+  'require at least one attachment','Amount exceeds the limit',
 ];
   const isKnownBusinessError = businessRuleErrors.some(p => message.includes(p));
 

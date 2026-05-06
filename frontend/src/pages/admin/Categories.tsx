@@ -10,10 +10,20 @@ interface Category {
   id: string;
   name: string;
   isActive: boolean;
+  maxAmount: number | null;
 }
 
+// Schema simples baseado em string — react-hook-form recebe strings dos inputs
+// Empty string = no limit (null on backend); valid positive number otherwise.
 const categorySchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
+  maxAmount: z
+    .string()
+    .optional()
+    .refine(
+      (val) => !val || (!isNaN(Number(val)) && Number(val) > 0),
+      { message: 'Limit must be a positive number' }
+    ),
 });
 
 type CategoryFormData = z.infer<typeof categorySchema>;
@@ -49,26 +59,41 @@ export function Categories() {
 
   const openCreateModal = () => {
     setEditingCategory(null);
-    reset({ name: '' });
+    reset({ name: '', maxAmount: '' });
     onOpen();
   };
 
   const openEditModal = (category: Category) => {
     setEditingCategory(category);
-    reset({ name: category.name });
+    reset({
+      name: category.name,
+      // Number → string para popular o input; null vira string vazia
+      maxAmount: category.maxAmount != null ? String(category.maxAmount) : '',
+    });
     onOpen();
   };
 
   const onSubmitForm = async (data: CategoryFormData) => {
     try {
       setIsSubmitting(true);
+      // Empty/undefined → null (sem limite); senão converte para número
+      const maxAmountValue =
+        !data.maxAmount || data.maxAmount.trim() === '' ? null : Number(data.maxAmount);
+
       if (editingCategory) {
         // Edit mode
-        await api.patch(`/categories/${editingCategory.id}`, { name: data.name, isActive: editingCategory.isActive });
+        await api.patch(`/categories/${editingCategory.id}`, {
+          name: data.name,
+          isActive: editingCategory.isActive,
+          maxAmount: maxAmountValue,
+        });
         toast({ title: 'Category updated!', status: 'success' });
       } else {
         // Create mode
-        await api.post('/categories', { name: data.name });
+        await api.post('/categories', {
+          name: data.name,
+          maxAmount: maxAmountValue,
+        });
         toast({ title: 'Category created successfully!', status: 'success' });
       }
       onClose();
@@ -112,6 +137,7 @@ export function Categories() {
               <Thead bg="gray.50">
                 <Tr>
                   <Th>Category Name</Th>
+                  <Th isNumeric>Max Amount (R$)</Th>
                   <Th>Status</Th>
                   <Th>Actions</Th>
                 </Tr>
@@ -120,6 +146,15 @@ export function Categories() {
                 {categories.map((cat) => (
                   <Tr key={cat.id} _hover={{ bg: 'gray.50' }}>
                     <Td fontWeight="bold" color="gray.700">{cat.name}</Td>
+                    <Td isNumeric>
+                      {cat.maxAmount !== null ? (
+                        <Text fontWeight="medium" color="gray.700">
+                          {cat.maxAmount.toFixed(2)}
+                        </Text>
+                      ) : (
+                        <Text color="gray.400" fontSize="sm">No limit</Text>
+                      )}
+                    </Td>
                     <Td>
                       <Badge colorScheme={cat.isActive ? 'green' : 'red'} px={2} py={1} borderRadius="md">
                         {cat.isActive ? 'ACTIVE' : 'INACTIVE'}
@@ -163,7 +198,7 @@ export function Categories() {
             <ModalHeader>{editingCategory ? 'Edit Category' : 'New Category'}</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <FormControl isInvalid={!!errors.name}>
+              <FormControl isInvalid={!!errors.name} mb={3}>
                 <FormLabel>Category Name</FormLabel>
                 <Input
                   placeholder="Ex: Travel, Accommodation..."
@@ -171,6 +206,24 @@ export function Categories() {
                   {...register('name')}
                 />
                 <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
+              </FormControl>
+
+              {/* EXTRA: per-category spending limit */}
+              <FormControl isInvalid={!!errors.maxAmount}>
+                <FormLabel>
+                  Max Amount (R$)
+                  <Text as="span" fontSize="xs" color="gray.500" ml={2} fontWeight="normal">
+                    Leave empty for no limit
+                  </Text>
+                </FormLabel>
+                <Input
+                  type="number"
+                  step="0.01"
+                  placeholder="Ex: 1000.00"
+                  focusBorderColor="brand.500"
+                  {...register('maxAmount')}
+                />
+                <FormErrorMessage>{errors.maxAmount?.message}</FormErrorMessage>
               </FormControl>
             </ModalBody>
             <ModalFooter>
