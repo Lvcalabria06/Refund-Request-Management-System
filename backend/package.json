@@ -8,7 +8,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "seed": "prisma db seed",
-    "test": "cross-env DATABASE_URL=file:./test.db prisma db push --skip-generate --accept-data-loss && cross-env DATABASE_URL=file:./test.db jest --runInBand"
+    "test": "cross-env DATABASE_URL=file:./test.db prisma db push --skip-generate --accept-data-loss && cross-env DATABASE_URL=file:./test.db jest --runInBand",
+    "postinstall": "node -e \"const fs=require('fs');if(!fs.existsSync('.env')&&fs.existsSync('.env.example'))fs.copyFileSync('.env.example','.env')\""
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"

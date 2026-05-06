@@ -1,5 +1,7 @@
 node_modules
 # Keep environment variables out of version control
+# (.env.example IS tracked — it's a template for new clones)
 .env
+!.env.example
 
 /generated/prisma

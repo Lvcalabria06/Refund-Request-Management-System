@@ -96,18 +96,22 @@ Sistema fullstack para gerenciamento de solicitações de reembolso corporativo,
 
 ```bash
 cd backend
-npm install
+npm install                 # instala dependências e cria o .env automaticamente
 npx prisma db push          # cria o banco SQLite e as tabelas
 npm run seed                # popula usuários e categorias
 npm run dev                 # inicia a API em http://localhost:3333
 ```
 
-O arquivo `.env` já está pré-configurado:
-```env
-DATABASE_URL="file:./dev.db"
-PORT=3333
-JWT_SECRET="supersecret_pitang_challenge"
-```
+> **Sobre o `.env`:** O arquivo `.env` é criado automaticamente após `npm install`,
+> a partir do template `.env.example` (que está versionado no Git). Caso queira
+> ajustar alguma chave (ex: `JWT_SECRET` para produção), edite o `.env` antes de subir.
+>
+> Conteúdo do template:
+> ```env
+> DATABASE_URL="file:./dev.db"
+> PORT=3333
+> JWT_SECRET="change_this_in_production"
+> ```
 
 ### 2. Frontend
 
