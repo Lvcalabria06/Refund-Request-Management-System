@@ -1,0 +1,25 @@
+# Não copiar node_modules — instalamos dentro do container (Alpine ≠ Windows/Mac)
+node_modules
+
+# Não copiar artefatos de build do host
+dist
+build
+
+# Logs do npm
+npm-debug.log*
+
+# Ambiente: o postinstall recria o .env dentro do container a partir do .env.example
+.env
+
+# Banco SQLite local — vamos gerar um novo no container
+prisma/dev.db
+prisma/test.db
+
+# Git e editor
+.git
+.gitignore
+.vscode
+.idea
+
+# Testes do host
+coverage

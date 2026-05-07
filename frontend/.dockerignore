@@ -1,0 +1,22 @@
+# Não copiar node_modules — instalamos dentro do container
+node_modules
+
+# Não copiar build do host
+dist
+build
+
+# Logs
+npm-debug.log*
+
+# Variáveis de ambiente locais (se houver)
+.env
+.env.local
+
+# Git e editor
+.git
+.gitignore
+.vscode
+.idea
+
+# Cobertura de testes
+coverage

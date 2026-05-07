@@ -1,0 +1,59 @@
+# Orquestra os 2 serviços (backend + frontend) em um comando só.
+# Subir tudo:    docker compose up
+# Subir em bg:   docker compose up -d
+# Derrubar:      docker compose down
+
+services:
+  backend:
+    # Constrói a image a partir do Dockerfile da pasta backend
+    build:
+      context: ./backend
+    container_name: refund-backend
+
+    # Mapeia a porta 3333 do container para a porta 3333 do host
+    # (3333 do navegador → 3333 do container)
+    ports:
+      - "3333:3333"
+
+    # Variáveis de ambiente injetadas no container.
+    # Sobrescrevem qualquer .env que exista dentro do container.
+    environment:
+      - DATABASE_URL=file:./dev.db
+      - PORT=3333
+      - JWT_SECRET=docker_dev_secret_change_in_production
+      - NODE_ENV=development
+
+    # Volumes — sincronizam pastas do host com o container.
+    # 1) Código-fonte: hot reload funciona porque ts-node-dev observa /app
+    # 2) node_modules anônimo: impede que o node_modules do host (Windows/Mac)
+    #    sobrescreva o do container (Alpine Linux), já que binários nativos
+    #    são incompatíveis entre OSs.
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+    # Comando de inicialização:
+    # 1) Cria/atualiza tabelas no SQLite (db push)
+    # 2) Popula usuários e categorias (seed)
+    # 3) Inicia o servidor de desenvolvimento
+    command: sh -c "npx prisma db push --skip-generate && npx prisma db seed && npm run dev"
+
+  frontend:
+    # Constrói a image a partir do Dockerfile da pasta frontend
+    build:
+      context: ./frontend
+    container_name: refund-frontend
+
+    # Mapeia a porta 5173 do Vite
+    ports:
+      - "5173:5173"
+
+    # Hot reload — mesma lógica do backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+    # Garante que o backend suba antes do frontend
+    # (não bloqueia, mas inicia na ordem certa)
+    depends_on:
+      - backend

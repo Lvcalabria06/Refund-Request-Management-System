@@ -14,6 +14,7 @@ Sistema fullstack para gerenciamento de solicitações de reembolso corporativo,
 6. [Decisões técnicas](#decisões-técnicas)
 7. [Como rodar os testes](#como-rodar-os-testes)
 8. [Endpoints da API](#endpoints-da-api)
+9. [Diferenciais (Plus)](#diferenciais-plus)
 
 ---
 
@@ -87,12 +88,53 @@ Sistema fullstack para gerenciamento de solicitações de reembolso corporativo,
 
 ## Como rodar o projeto
 
-### Pré-requisitos
+Existem **dois caminhos**: usando **Docker** (recomendado, mais simples) ou rodando localmente com Node.js.
+
+---
+
+### 🐳 Opção A — Com Docker (recomendado)
+
+**Único pré-requisito:** ter o [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado (não precisa nem de Node).
+j
+Na raiz do projeto:
+
+```bash
+docker compose up           # constrói as imagens e sobe backend + frontend
+```
+
+Pronto. Acesse:
+- Backend: **http://localhost:3333**
+- Frontend: **http://localhost:5173**
+
+O `docker-compose.yml` cuida de:
+1. Instalar as dependências do backend e frontend
+2. Gerar o cliente Prisma
+3. Criar/atualizar o banco SQLite (`prisma db push`)
+4. Popular usuários e categorias (`prisma db seed`)
+5. Subir o servidor da API (porta 3333) e o Vite (porta 5173)
+
+#### Comandos úteis do Docker
+
+```bash
+docker compose up                # sobe tudo (foreground, mostra logs)
+docker compose up -d             # sobe em background (libera o terminal)
+docker compose up --build        # força reconstruir as imagens
+docker compose down              # derruba os containers
+docker compose down -v           # derruba + apaga volumes (zera o banco)
+docker compose logs -f backend   # ver logs do backend ao vivo
+docker compose exec backend sh   # entrar dentro do container backend (debug)
+```
+
+---
+
+### 💻 Opção B — Rodando localmente (sem Docker)
+
+#### Pré-requisitos
 
 - **Node.js 20.19+** (ou 22.12+) — exigido pelo Vite. Se usar `nvm`, basta rodar `nvm use` na raiz do projeto (existe um `.nvmrc` configurado).
 - **npm** (já vem com o Node)
 
-#### Como conferir/atualizar o Node.js
+##### Como conferir/atualizar o Node.js
 
 ```bash
 node -v                 # confere a versão atual
@@ -105,7 +147,7 @@ nvm use                 # ativa a versão do .nvmrc
 > Se a versão do Node estiver errada, o `npm install` ainda funciona, mas o `npm run dev` falha com erro de
 > `styleText` ou `import` não encontrado. Sempre confira `node -v` antes.
 
-### 1. Backend
+#### 1. Backend
 
 ```bash
 cd backend
@@ -126,7 +168,7 @@ npm run dev                 # inicia a API em http://localhost:3333
 > JWT_SECRET="change_this_in_production"
 > ```
 
-### 2. Frontend
+#### 2. Frontend
 
 Em outro terminal:
 
@@ -385,6 +427,46 @@ Uma collection completa do Postman está disponível em
 9. Reimbursements → Workflow → Pay
 10. Reimbursements → History → Get History      [vê toda a trilha]
 ```
+
+## Diferenciais (Plus)
+
+A seção 17 do desafio lista 19 itens **opcionais** que contam como diferencial positivo. Abaixo está a lista completa, separando o que foi implementado e o que ficou de fora.
+
+### ✅ Implementados (15 de 19)
+
+| # | Diferencial | Onde está no projeto |
+|---|---|---|
+| 1 | **Seeds iniciais** | `backend/prisma/seed.ts` cria 4 usuários (1 de cada perfil) e 4 categorias (com limites diferentes) |
+| 2 | **Mais testes automatizados no backend** | `backend/tests/reimbursement.test.ts` — 13 testes de integração cobrindo auth, validações, RBAC, fluxos de cancelamento/rejeição, happy path, anexos e histórico |
+| 3 | **Mais testes automatizados no frontend** | 13 testes em 3 arquivos (`Login.test.tsx`, `ProtectedRoute.test.tsx`, `Sidebar.test.tsx`) cobrindo formulários, validações e renderização condicional por perfil |
+| 4 | **Docker Compose** | `docker-compose.yml` na raiz orquestra backend + frontend com `docker compose up`. Inclui hot reload, seed automático e volumes para persistência. Não exige Node instalado na máquina do avaliador |
+| 5 | **Limite de valor configurável por categoria** | Campo `maxAmount` em Category. ADMIN define no modal de "New Category"; quando EMPLOYEE tenta criar/editar reembolso acima do limite, recebe erro visual em tempo real e o backend bloqueia com 400 |
+| 6 | **Bloqueio de despesas futuras** | `ReimbursementService.create` valida `expenseDate.isAfter(dayjs())` usando DayJS — rejeita datas no futuro |
+| 7 | **Bloqueio de solicitação sem anexo acima de determinado valor** | `submit` exige pelo menos 1 anexo quando `amount > R$ 500` (constante `ATTACHMENT_REQUIRED_THRESHOLD`) |
+| 8 | **Preview/download de anexos** | Anexos são salvos como data URLs base64; o link "Open" no detalhe do reembolso abre/baixa o arquivo direto no navegador |
+| 9 | **Dashboard com totais** | `pages/Dashboard.tsx` tem 4 dashboards distintos por perfil (EMPLOYEE/MANAGER/FINANCE/ADMIN) com KPIs: contagens por status, total pago, total pendente, total de usuários, etc. |
+| 10 | **Collection do Postman** | [`docs/Pitang Refunds API.postman_collection.json`](./docs/Pitang%20Refunds%20API.postman_collection.json) — collection completa com tokens auto-populados e scripts de teste |
+| 11 | **Upload de comprovantes (simulado)** | Tela de Detalhe permite escolher arquivo do computador via `<input type="file">`. O conteúdo é convertido em base64 (data URL) e armazenado no banco. **Conforme permitido pelo documento:** *"upload de anexos, podendo ser simulado"* |
+| 12 | **Filtro por status** | Listagem de reembolsos aceita query param `?status=DRAFT` (ou SUBMITTED, APPROVED, etc.). UI tem `<Select>` para o usuário aplicar o filtro |
+| 13 | **Filtro por categoria** | Listagem de reembolsos aceita query param `?categoryId=<uuid>`. UI tem `<Select>` populado com as categorias ativas |
+| 14 | **Ordenação por data ou valor** | Listagem aceita query params `?orderBy=expenseDate&order=desc` (ou `amount`, `createdAt`). UI tem `<Select>` para o usuário escolher campo e direção |
+| 15 | Busca por colaborador |
+### ❌ Não implementados (4 de 19)
+
+| # | Diferencial | Observação |
+|---|---|---|
+| 1 | Paginação | Listagens retornam todos os registros |
+| 2 | Busca por colaborador | Sem busca textual em nenhuma listagem |
+| 3 | Soft delete | Categories usa `isActive` (parecido), mas não há campo `deletedAt` em nenhum modelo |
+| 4 | Consumo de API externa | Nenhuma chamada para serviços externos (BrasilAPI, ViaCEP, etc.) |
+| 5 | Refresh token | JWT expira em 1 dia. Não há mecanismo de renovação automática — usuário precisa relogar |
+
+### Resumo
+
+- **15 de 19 diferenciais implementados** (79%)
+- **4 itens fora do escopo** (paginação, busca textual, soft delete, API externa, refresh token)
+
+---
 
 ## Autor
 Lucas Valois Calabria
