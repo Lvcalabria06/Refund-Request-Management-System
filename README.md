@@ -451,19 +451,18 @@ A seção 17 do desafio lista 19 itens **opcionais** que contam como diferencial
 | 13 | **Filtro por categoria** | Listagem de reembolsos aceita query param `?categoryId=<uuid>`. UI tem `<Select>` populado com as categorias ativas |
 | 14 | **Ordenação por data ou valor** | Listagem aceita query params `?orderBy=expenseDate&order=desc` (ou `amount`, `createdAt`). UI tem `<Select>` para o usuário escolher campo e direção |
 | 15 | Busca por colaborador |
-### ❌ Não implementados (4 de 19)
+| 16 | Paginação | Listagens retornam todos os registros |
+### ❌ Não implementados (3 de 19)
 
 | # | Diferencial | Observação |
 |---|---|---|
-| 1 | Paginação | Listagens retornam todos os registros |
-| 2 | Busca por colaborador | Sem busca textual em nenhuma listagem |
-| 3 | Soft delete | Categories usa `isActive` (parecido), mas não há campo `deletedAt` em nenhum modelo |
-| 4 | Consumo de API externa | Nenhuma chamada para serviços externos (BrasilAPI, ViaCEP, etc.) |
-| 5 | Refresh token | JWT expira em 1 dia. Não há mecanismo de renovação automática — usuário precisa relogar |
+| 1 | Soft delete | Categories usa `isActive` (parecido), mas não há campo `deletedAt` em nenhum modelo |
+| 2 | Consumo de API externa | Nenhuma chamada para serviços externos (BrasilAPI, ViaCEP, etc.) |
+| 3 | Refresh token | JWT expira em 1 dia. Não há mecanismo de renovação automática — usuário precisa relogar |
 
 ### Resumo
 
-- **15 de 19 diferenciais implementados** (79%)
+- **16 de 19 diferenciais implementados** (84%)
 - **4 itens fora do escopo** (paginação, busca textual, soft delete, API externa, refresh token)
 
 ---
