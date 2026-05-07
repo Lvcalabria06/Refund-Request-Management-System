@@ -432,7 +432,7 @@ Uma collection completa do Postman está disponível em
 
 A seção 17 do desafio lista 19 itens **opcionais** que contam como diferencial positivo. Abaixo está a lista completa, separando o que foi implementado e o que ficou de fora.
 
-### ✅ Implementados (15 de 19)
+### ✅ Implementados (16 de 19)
 
 | # | Diferencial | Onde está no projeto |
 |---|---|---|
@@ -463,7 +463,7 @@ A seção 17 do desafio lista 19 itens **opcionais** que contam como diferencial
 ### Resumo
 
 - **16 de 19 diferenciais implementados** (84%)
-- **4 itens fora do escopo** (paginação, busca textual, soft delete, API externa, refresh token)
+
 
 ---
 
