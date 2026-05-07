@@ -25,7 +25,7 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response && error.response.status === 401) {
+    if (error.response && error.response.status === 401 && window.location.pathname !== '/login') {
       // Se der 401, removemos os dados de auth e jogamos o usuário pra tela de login
       localStorage.removeItem('token');
       localStorage.removeItem('user');

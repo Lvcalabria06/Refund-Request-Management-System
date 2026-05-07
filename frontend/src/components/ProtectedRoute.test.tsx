@@ -21,8 +21,8 @@ vi.mock('./AppLayout', () => ({
   ),
 }));
 
-const Protected = () => <div>Conteúdo Privado</div>;
-const LoginPage = () => <div>Tela de Login</div>;
+const Protected = () => <div>Private Content</div>;
+const LoginPage = () => <div>Login Screen</div>;
 const HomePage = () => <div>Home</div>;
 
 function renderRoutes(initial = '/private', allowedRoles?: string[]) {
@@ -44,25 +44,25 @@ function renderRoutes(initial = '/private', allowedRoles?: string[]) {
 }
 
 describe('ProtectedRoute', () => {
-  it('redireciona para /login quando o usuário NÃO está autenticado', () => {
+  it('redirects to /login when the user is NOT authenticated', () => {
     mockAuthValue = { isAuthenticated: false, user: null };
     renderRoutes('/private');
 
-    expect(screen.getByText(/tela de login/i)).toBeInTheDocument();
-    expect(screen.queryByText(/conteúdo privado/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/login screen/i)).toBeInTheDocument();
+    expect(screen.queryByText(/private content/i)).not.toBeInTheDocument();
   });
 
-  it('renderiza o conteúdo quando o usuário ESTÁ autenticado', () => {
+  it('renders the content when the user IS authenticated', () => {
     mockAuthValue = {
       isAuthenticated: true,
       user: { id: '1', name: 'João', role: 'EMPLOYEE' },
     };
     renderRoutes('/private');
 
-    expect(screen.getByText(/conteúdo privado/i)).toBeInTheDocument();
+    expect(screen.getByText(/private content/i)).toBeInTheDocument();
   });
 
-  it('redireciona para / quando o role do usuário NÃO está permitido', () => {
+  it('redirects to / when the user role is NOT allowed', () => {
     mockAuthValue = {
       isAuthenticated: true,
       user: { id: '1', name: 'João', role: 'EMPLOYEE' },
@@ -70,16 +70,16 @@ describe('ProtectedRoute', () => {
     renderRoutes('/private', ['MANAGER']); // só permite MANAGER, mas o user é EMPLOYEE
 
     expect(screen.getByText(/^home$/i)).toBeInTheDocument();
-    expect(screen.queryByText(/conteúdo privado/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/private content/i)).not.toBeInTheDocument();
   });
 
-  it('renderiza o conteúdo quando o role do usuário ESTÁ permitido', () => {
+  it('renders the content when the user role IS allowed', () => {
     mockAuthValue = {
       isAuthenticated: true,
       user: { id: '1', name: 'Ana', role: 'MANAGER' },
     };
     renderRoutes('/private', ['MANAGER', 'ADMIN']);
 
-    expect(screen.getByText(/conteúdo privado/i)).toBeInTheDocument();
+    expect(screen.getByText(/private content/i)).toBeInTheDocument();
   });
 });

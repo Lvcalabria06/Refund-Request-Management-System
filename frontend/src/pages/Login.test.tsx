@@ -22,39 +22,39 @@ describe('Login', () => {
     mockPost.mockReset();
   });
 
-  it('renderiza os campos de e-mail, senha e o botão Entrar', () => {
+  it('renders email, password fields and Sign In button', () => {
     renderWithProviders(<Login />);
 
-    expect(screen.getByLabelText(/e-mail/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/senha/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /entrar/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
   });
 
-  it('exibe mensagem de erro quando o e-mail é inválido', async () => {
+  it('shows error message when email is invalid', async () => {
     const user = userEvent.setup();
     renderWithProviders(<Login />);
 
-    await user.type(screen.getByLabelText(/e-mail/i), 'naoehemail');
-    await user.type(screen.getByLabelText(/senha/i), '123456');
+    await user.type(screen.getByLabelText(/email/i), 'notanemail');
+    await user.type(screen.getByLabelText(/password/i), '123456');
 
     // fireEvent.submit bypassa a validação HTML5 do type="email"
     // (que normalmente bloquearia o submit no jsdom). Em produção
     // o usuário também é barrado, mas com a mensagem nativa do navegador.
     // Aqui forçamos o Zod a validar para conferir nossa própria mensagem.
-    const form = screen.getByLabelText(/e-mail/i).closest('form')!;
+    const form = screen.getByLabelText(/email/i).closest('form')!;
     fireEvent.submit(form);
 
     expect(await screen.findByText(/invalid email/i)).toBeInTheDocument();
     expect(mockPost).not.toHaveBeenCalled();
   });
 
-  it('exibe mensagem de erro quando a senha tem menos de 6 caracteres', async () => {
+  it('shows error message when password has fewer than 6 characters', async () => {
     const user = userEvent.setup();
     renderWithProviders(<Login />);
 
-    await user.type(screen.getByLabelText(/e-mail/i), 'teste@teste.com');
-    await user.type(screen.getByLabelText(/senha/i), '123');
-    await user.click(screen.getByRole('button', { name: /entrar/i }));
+    await user.type(screen.getByLabelText(/email/i), 'test@test.com');
+    await user.type(screen.getByLabelText(/password/i), '123');
+    await user.click(screen.getByRole('button', { name: /sign in/i }));
 
     expect(
       await screen.findByText(/password must be at least 6 characters/i)
@@ -62,7 +62,7 @@ describe('Login', () => {
     expect(mockPost).not.toHaveBeenCalled();
   });
 
-  it('chama a API com os dados corretos quando o formulário é válido', async () => {
+  it('calls the API with the correct data when the form is valid', async () => {
     mockPost.mockResolvedValue({
       data: { token: 'fake-jwt', user: { id: '1', name: 'João', email: 'joao@test.com', role: 'EMPLOYEE' } },
     });
@@ -70,9 +70,9 @@ describe('Login', () => {
     const user = userEvent.setup();
     renderWithProviders(<Login />);
 
-    await user.type(screen.getByLabelText(/e-mail/i), 'joao@test.com');
-    await user.type(screen.getByLabelText(/senha/i), '123456');
-    await user.click(screen.getByRole('button', { name: /entrar/i }));
+    await user.type(screen.getByLabelText(/email/i), 'joao@test.com');
+    await user.type(screen.getByLabelText(/password/i), '123456');
+    await user.click(screen.getByRole('button', { name: /sign in/i }));
 
     await waitFor(() => {
       expect(mockPost).toHaveBeenCalledWith('/auth/login', {

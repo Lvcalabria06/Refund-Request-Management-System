@@ -53,7 +53,7 @@ export class ReimbursementService {
       return reimbursement;
     });
   }
-
+  
   async update(id: string, data: z.infer<typeof import('../schemas/reimbursementSchema').updateReimbursementSchema>, user: { id: string; role: string }) {
     if (user.role !== 'EMPLOYEE') {
       throw new Error('Only EMPLOYEE can update reimbursements');
