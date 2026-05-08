@@ -24,7 +24,7 @@ export class AuthService {
     if (!user) throw new Error('Invalid credentials');
 
     // Block login for soft-deleted (deactivated) accounts
-    if (user.deletedAt !== null) throw new Error('Account is deactivated. Contact your administrator.');
+    if (user.deletedAt) throw new Error('Account is deactivated. Contact your administrator.');
 
     const isPasswordValid = await bcrypt.compare(data.password, user.password);
     if (!isPasswordValid) throw new Error('Invalid credentials');
@@ -49,6 +49,7 @@ export class AuthService {
 
     const user = await prisma.user.findUnique({ where: { id: stored.userId } });
     if (!user) throw new Error('User not found');
+    if (user.deletedAt) throw new Error('Account is deactivated. Contact your administrator.');
 
     // Rotate: delete old token, issue new pair
     await prisma.refreshToken.delete({ where: { id: stored.id } });

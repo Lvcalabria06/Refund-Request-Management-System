@@ -33,10 +33,10 @@ services:
       - /app/node_modules
 
     # Comando de inicialização:
-    # 1) Cria/atualiza tabelas no SQLite (db push)
+    # 1) Cria/atualiza tabelas no SQLite (db push) + gera o Client (importante para evitar cache desatualizado)
     # 2) Popula usuários e categorias (seed)
     # 3) Inicia o servidor de desenvolvimento
-    command: sh -c "npx prisma db push --skip-generate && npx prisma db seed && npm run dev"
+    command: sh -c "npx prisma db push && npx prisma db seed && npm run dev"
 
   frontend:
     # Constrói a image a partir do Dockerfile da pasta frontend

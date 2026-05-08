@@ -95,7 +95,7 @@ Existem **dois caminhos**: usando **Docker** (recomendado, mais simples) ou roda
 ### 🐳 Opção A — Com Docker (recomendado)
 
 **Único pré-requisito:** ter o [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado (não precisa nem de Node).
-j
+
 Na raiz do projeto:
 
 ```bash
@@ -329,16 +329,20 @@ Base URL: `http://localhost:3333`
 ### Autenticação
 | Método | Rota | Auth | Descrição |
 |---|---|---|---|
-| POST | `/auth/login` | — | Autentica e retorna `{ token, user }` |
+| POST | `/auth/login` | — | Autentica e retorna `{ user, token, refreshToken }` |
+| POST | `/auth/refresh` | — | Renova o access token usando o refresh token |
+| POST | `/auth/logout` | — | Revoga o refresh token do banco |
 
 ### Usuários
 | Método | Rota | Auth | Descrição |
 |---|---|---|---|
-| GET | `/users` | ADMIN | Lista todos os usuários |
-| GET | `/users/:id` | ADMIN | Detalhes de um usuário |
+| GET | `/users` | ADMIN | Lista todos os usuários ativos |
+| GET | `/users/deleted` | ADMIN | Lista todos os usuários desativados (soft-deleted) |
+| GET | `/users/:id` | ADMIN | Detalhes de um usuário ativo |
 | POST | `/users` | ADMIN | Cria novo usuário |
-| PUT | `/users/:id` | ADMIN | Atualiza nome, e-mail, senha e/ou role (parcial) |
-| DELETE | `/users/:id` | ADMIN | Remove usuário (não permitido para si mesmo nem se houver reembolsos/histórico) |
+| PUT | `/users/:id` | ADMIN | Atualiza nome, e-mail, senha e/ou role |
+| DELETE | `/users/:id` | ADMIN | Desativa usuário (Soft delete) e revoga sessões (não permitido para si mesmo) |
+| PATCH | `/users/:id/restore` | ADMIN | Restaura (reativa) um usuário desativado |
 
 ### Categorias
 | Método | Rota | Auth | Descrição |
@@ -432,7 +436,7 @@ Uma collection completa do Postman está disponível em
 
 A seção 17 do desafio lista 19 itens **opcionais** que contam como diferencial positivo. Abaixo está a lista completa, separando o que foi implementado e o que ficou de fora.
 
-### ✅ Implementados (18 de 19)
+### ✅ Implementados (19 de 19)
 
 | # | Diferencial | Onde está no projeto |
 |---|---|---|
@@ -450,19 +454,15 @@ A seção 17 do desafio lista 19 itens **opcionais** que contam como diferencial
 | 12 | **Filtro por status** | Listagem de reembolsos aceita query param `?status=DRAFT` (ou SUBMITTED, APPROVED, etc.). UI tem `<Select>` para o usuário aplicar o filtro |
 | 13 | **Filtro por categoria** | Listagem de reembolsos aceita query param `?categoryId=<uuid>`. UI tem `<Select>` populado com as categorias ativas |
 | 14 | **Ordenação por data ou valor** | Listagem aceita query params `?orderBy=expenseDate&order=desc` (ou `amount`, `createdAt`). UI tem `<Select>` para o usuário escolher campo e direção |
-| 15 | Busca por colaborador |
-| 16 | Paginação | Listagens retornam todos os registros |
-| 17 | Refresh token |
-| 18 | Soft delete |
-
-### ❌ Não implementados (1 de 19)
-| # | Diferencial | Observação |
-|---|---|---|
-| 2 | Consumo de API externa | Nenhuma chamada para serviços externos (BrasilAPI, ViaCEP, etc.) |
+| 15 | **Busca por colaborador** | Filtro funcional na tela de Listagem de Reembolsos |
+| 16 | **Paginação** | Listagens retornam todos os registros |
+| 17 | **Refresh token** | Autenticação em 2 tokens (Access e Refresh) e rotação automática via interceptor do Axios |
+| 18 | **Soft delete** | Usuários desativados perdem acesso imediato via middleware mas mantêm seus dados históricos no banco |
+| 19 | **Consumo de API Externa** | Tela de `New Reimbursement` integra com a **BrasilAPI** para auto-completar a descrição com a Razão Social da empresa a partir do CNPJ fornecido |
 
 ### Resumo
 
-- **17 de 19 diferenciais implementados** (89%)
+- **19 de 19 diferenciais implementados** (100%)
 
 
 ---

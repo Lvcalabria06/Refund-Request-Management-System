@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Box, Button, Flex, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, Input, Select, VStack, useToast, Icon, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
-import { ArrowLeft, Save } from 'lucide-react';
+import { Box, Button, Flex, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, Input, Select, VStack, useToast, Icon, Spinner, Alert, AlertIcon, InputGroup, InputRightElement, Text } from '@chakra-ui/react';
+import { ArrowLeft, Save, Search } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { api } from '../../services/api';
 import dayjs from 'dayjs';
+import axios from 'axios';
 
 const newReimbursementSchema = z.object({
   description: z.string().min(5, 'Description must be at least 5 characters'),
@@ -27,6 +28,11 @@ export function NewReimbursement() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
+  
+  // EXTRA: External API Consumption (BrasilAPI CNPJ)
+  const [merchantCnpj, setMerchantCnpj] = useState('');
+  const [fetchingCnpj, setFetchingCnpj] = useState(false);
+
   const navigate = useNavigate();
   const { id } = useParams();
   const toast = useToast();
@@ -46,6 +52,34 @@ export function NewReimbursement() {
     typeof watchedAmount === 'number' &&
     !isNaN(watchedAmount) &&
     watchedAmount > selectedCategory.maxAmount;
+
+  const handleCnpjSearch = async () => {
+    const cleanCnpj = merchantCnpj.replace(/\D/g, '');
+    if (cleanCnpj.length !== 14) {
+      toast({ title: 'Invalid CNPJ', description: 'CNPJ must contain exactly 14 digits.', status: 'warning' });
+      return;
+    }
+
+    try {
+      setFetchingCnpj(true);
+      const res = await axios.get(`https://brasilapi.com.br/api/cnpj/v1/${cleanCnpj}`);
+      
+      const razaoSocial = res.data.razao_social || res.data.nome_fantasia;
+      if (razaoSocial) {
+        // Auto-fill the description field
+        const currentDesc = watch('description') || '';
+        setValue('description', currentDesc ? `${currentDesc} - ${razaoSocial}` : `Despesa em ${razaoSocial}`, {
+          shouldValidate: true,
+          shouldDirty: true
+        });
+        toast({ title: 'Company found!', description: `Added "${razaoSocial}" to description.`, status: 'success' });
+      }
+    } catch (err) {
+      toast({ title: 'CNPJ not found', description: 'Could not fetch data from BrasilAPI.', status: 'error' });
+    } finally {
+      setFetchingCnpj(false);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -142,6 +176,34 @@ export function NewReimbursement() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <VStack spacing={5} align="stretch">
             
+            {/* EXTRA: External API Consumption (BrasilAPI CNPJ) */}
+            <FormControl>
+              <FormLabel color="gray.700" fontWeight="medium">Merchant CNPJ (Optional)</FormLabel>
+              <FormHelperText mb={2} mt={0} color="gray.500">
+                Enter a CNPJ to auto-fill the description with the company name.
+              </FormHelperText>
+              <InputGroup size="md">
+                <Input
+                  placeholder="00.000.000/0000-00"
+                  value={merchantCnpj}
+                  onChange={(e) => setMerchantCnpj(e.target.value)}
+                  focusBorderColor="brand.500"
+                />
+                <InputRightElement width="4.5rem">
+                  <Button 
+                    h="1.75rem" 
+                    size="sm" 
+                    colorScheme="brand" 
+                    onClick={handleCnpjSearch}
+                    isLoading={fetchingCnpj}
+                    isDisabled={!merchantCnpj}
+                  >
+                    <Icon as={Search} boxSize={4} />
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
+            </FormControl>
+
             <FormControl isInvalid={!!errors.description}>
               <FormLabel color="gray.700" fontWeight="medium">Expense Description</FormLabel>
               <Input placeholder="Ex: Business lunch with client" {...register('description')} focusBorderColor="brand.500" />
