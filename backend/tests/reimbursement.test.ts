@@ -16,6 +16,7 @@ describe('Reimbursement API Integration Tests', () => {
     await prisma.reimbursementHistory.deleteMany();
     await prisma.reimbursement.deleteMany();
     await prisma.category.deleteMany();
+    await prisma.refreshToken.deleteMany();
     await prisma.user.deleteMany();
 
     const passwordHash = await bcrypt.hash('123456', 10);

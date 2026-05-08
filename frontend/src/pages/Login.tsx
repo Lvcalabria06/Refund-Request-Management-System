@@ -148,11 +148,11 @@ export function Login() {
 
           <Box textAlign="center" pt={4} borderTop="1px solid" borderColor="gray.100">
             <Text fontSize="sm" color="gray.500" fontWeight="medium">
-              Default test accounts:
+              Default test accounts (password: 123456)
             </Text>
             <Text fontSize="xs" color="gray.400" mt={1}>
-              emp@test.com | mgr@test.com | fin@test.com<br />
-              Password: 123456
+              admin@pitang.com · employee@pitang.com<br />
+              manager@pitang.com · finance@pitang.com
             </Text>
           </Box>
         </VStack>

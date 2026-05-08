@@ -432,7 +432,7 @@ Uma collection completa do Postman está disponível em
 
 A seção 17 do desafio lista 19 itens **opcionais** que contam como diferencial positivo. Abaixo está a lista completa, separando o que foi implementado e o que ficou de fora.
 
-### ✅ Implementados (17 de 19)
+### ✅ Implementados (18 de 19)
 
 | # | Diferencial | Onde está no projeto |
 |---|---|---|
@@ -453,11 +453,11 @@ A seção 17 do desafio lista 19 itens **opcionais** que contam como diferencial
 | 15 | Busca por colaborador |
 | 16 | Paginação | Listagens retornam todos os registros |
 | 17 | Refresh token |
-### ❌ Não implementados (2 de 19)
+| 18 | Soft delete |
 
+### ❌ Não implementados (1 de 19)
 | # | Diferencial | Observação |
 |---|---|---|
-| 1 | Soft delete | Categories usa `isActive` (parecido), mas não há campo `deletedAt` em nenhum modelo |
 | 2 | Consumo de API externa | Nenhuma chamada para serviços externos (BrasilAPI, ViaCEP, etc.) |
 
 ### Resumo

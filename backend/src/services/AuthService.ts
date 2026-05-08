@@ -5,7 +5,7 @@ import crypto from 'crypto';
 import { z } from 'zod';
 import { loginSchema } from '../schemas/authSchema';
 
-const ACCESS_TOKEN_EXPIRY  = '15m';  // short-lived
+const ACCESS_TOKEN_EXPIRY = '15m';  // short-lived
 const REFRESH_TOKEN_EXPIRY = 7 * 24 * 60 * 60 * 1000; // 7 days in ms
 
 function getSecret(): string {
@@ -22,6 +22,9 @@ export class AuthService {
   async login(data: z.infer<typeof loginSchema>) {
     const user = await prisma.user.findUnique({ where: { email: data.email } });
     if (!user) throw new Error('Invalid credentials');
+
+    // Block login for soft-deleted (deactivated) accounts
+    if (user.deletedAt !== null) throw new Error('Account is deactivated. Contact your administrator.');
 
     const isPasswordValid = await bcrypt.compare(data.password, user.password);
     if (!isPasswordValid) throw new Error('Invalid credentials');

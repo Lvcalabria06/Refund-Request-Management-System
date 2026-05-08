@@ -16,6 +16,7 @@ model User {
   email          String                 @unique
   password       String
   role           String                 @default("EMPLOYEE") // EMPLOYEE, MANAGER, FINANCE, ADMIN
+  deletedAt      DateTime?              // null = active; set = soft-deleted (cannot login)
   createdAt      DateTime               @default(now())
   updatedAt      DateTime               @updatedAt
 
