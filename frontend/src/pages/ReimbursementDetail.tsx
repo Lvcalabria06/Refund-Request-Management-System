@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import {
   Box,
   Button,
@@ -64,6 +65,7 @@ export function ReimbursementDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const toast = useToast();
+  const { user: loggedUser } = useAuth();
 
   const [reimbursement, setReimbursement] = useState<Reimbursement | null>(null);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -221,8 +223,10 @@ export function ReimbursementDetail() {
     );
   }
 
+  // Only the owner EMPLOYEE can add/delete attachments (DRAFT or SUBMITTED status)
   const canAddAttachment =
-    reimbursement.status === 'DRAFT' || reimbursement.status === 'SUBMITTED';
+    loggedUser?.role === 'EMPLOYEE' &&
+    (reimbursement.status === 'DRAFT' || reimbursement.status === 'SUBMITTED');
 
   return (
     <Box>
