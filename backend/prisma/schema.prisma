@@ -21,6 +21,7 @@ model User {
 
   reimbursements Reimbursement[]        @relation("UserReimbursements")
   actions        ReimbursementHistory[] @relation("UserHistoryActions")
+  refreshTokens  RefreshToken[]
 }
 
 model Category {
@@ -81,4 +82,15 @@ model Attachment {
   reimbursement   Reimbursement @relation(fields: [reimbursementId], references: [id])
 
   createdAt       DateTime      @default(now())
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique          // hashed token stored in DB
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }

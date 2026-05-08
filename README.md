@@ -432,7 +432,7 @@ Uma collection completa do Postman está disponível em
 
 A seção 17 do desafio lista 19 itens **opcionais** que contam como diferencial positivo. Abaixo está a lista completa, separando o que foi implementado e o que ficou de fora.
 
-### ✅ Implementados (16 de 19)
+### ✅ Implementados (17 de 19)
 
 | # | Diferencial | Onde está no projeto |
 |---|---|---|
@@ -452,17 +452,17 @@ A seção 17 do desafio lista 19 itens **opcionais** que contam como diferencial
 | 14 | **Ordenação por data ou valor** | Listagem aceita query params `?orderBy=expenseDate&order=desc` (ou `amount`, `createdAt`). UI tem `<Select>` para o usuário escolher campo e direção |
 | 15 | Busca por colaborador |
 | 16 | Paginação | Listagens retornam todos os registros |
-### ❌ Não implementados (3 de 19)
+| 17 | Refresh token |
+### ❌ Não implementados (2 de 19)
 
 | # | Diferencial | Observação |
 |---|---|---|
 | 1 | Soft delete | Categories usa `isActive` (parecido), mas não há campo `deletedAt` em nenhum modelo |
 | 2 | Consumo de API externa | Nenhuma chamada para serviços externos (BrasilAPI, ViaCEP, etc.) |
-| 3 | Refresh token | JWT expira em 1 dia. Não há mecanismo de renovação automática — usuário precisa relogar |
 
 ### Resumo
 
-- **16 de 19 diferenciais implementados** (84%)
+- **17 de 19 diferenciais implementados** (89%)
 
 
 ---

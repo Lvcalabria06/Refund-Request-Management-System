@@ -330,7 +330,7 @@ export class ReimbursementService {
     if (reimbursement.status !== 'DRAFT' && reimbursement.status !== 'SUBMITTED') {
       throw new Error('Attachments can only be added to DRAFT or SUBMITTED reimbursements');
     }
-
+    
     return prisma.attachment.create({
       data: {
         fileName: data.fileName,

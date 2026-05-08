@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AuthService } from '../services/AuthService';
-import { loginSchema} from '../schemas/authSchema';
+import { loginSchema } from '../schemas/authSchema';
 import { ZodError } from 'zod';
 
 const authService = new AuthService();
@@ -18,5 +18,27 @@ export class AuthController {
         res.status(401).json({ error: error.message });
       }
     }
+  }
+
+  async refresh(req: Request, res: Response) {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      res.status(400).json({ error: 'refreshToken is required' });
+      return;
+    }
+    try {
+      const result = await authService.refresh(refreshToken);
+      res.status(200).json(result);
+    } catch (error: any) {
+      res.status(401).json({ error: error.message });
+    }
+  }
+
+  async logout(req: Request, res: Response) {
+    const { refreshToken } = req.body;
+    if (refreshToken) {
+      await authService.logout(refreshToken).catch(() => {}); // best-effort
+    }
+    res.status(204).send();
   }
 }

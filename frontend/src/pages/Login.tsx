@@ -47,8 +47,8 @@ export function Login() {
       setIsLoading(true);
       const response = await api.post('/auth/login', data);
 
-      const { token, user } = response.data;
-      login(token, user);
+      const { token, refreshToken, user } = response.data;
+      login(token, refreshToken, user);
 
       toast({
         title: 'Login successful!',
